@@ -1,0 +1,762 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ==========================================================================
+   MATERIAL SYSTEM
+   Four materials and one accent. Everything else is restraint.
+   ========================================================================== */
+
+@layer base {
+  :root {
+    /* --- Ivory: warm, handmade, never white ------------------------------ */
+    --ivory: 44 39 28;
+    --ivory-soft: 251 248 241;
+    --ivory-deep: 232 223 205;
+
+    /* --- Antique gold: brass and leaf, never yellow ---------------------- */
+    --gold: 201 162 39;
+    --gold-light: 232 217 160;
+    --gold-pale: 240 230 200;
+    --gold-antique: 168 132 43;
+    --gold-deep: 122 95 23;
+    --gold-shadow: 74 55 14;
+
+    /* --- Emerald: the estate, the night, the velvet ---------------------- */
+    --emerald: 12 43 34;
+    --emerald-rich: 18 58 45;
+    --emerald-deep: 7 26 20;
+
+    /* --- Ink ------------------------------------------------------------- */
+    --ink: 8 8 10;
+    /* Warm near-black, for text set on ivory paper. Never pure #000. */
+    --ink-warm: 42 36 28;
+
+    /* --- Burgundy: used sparingly, for warmth ---------------------------- */
+    --burgundy: 74 18 32;
+    --burgundy-muted: 138 46 66;
+
+    /* --- Type scale ------------------------------------------------------ */
+    --font-mono: ui-monospace, 'SFMono-Regular', 'Cascadia Mono', 'Segoe UI Mono', monospace;
+
+    /* --- Motion ---------------------------------------------------------- */
+    --ease-silk: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-seal: cubic-bezier(0.65, 0, 0.35, 1);
+
+    /* --- Chrome ---------------------------------------------------------- */
+    --header-h: 0px;
+    --gutter: clamp(1.25rem, 5vw, 4rem);
+    --measure: 62ch;
+
+    /* --- TEXTURES --------------------------------------------------------
+       Inline SVG so there are zero extra requests and nothing can 404.
+       --grain  : fine film grain, blended soft-light. Unifies every surface.
+       --marble : low-frequency turbulence, heavily contrasted → stone veining.
+       -------------------------------------------------------------------- */
+    --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.42'/%3E%3C/svg%3E");
+    --marble: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='700' height='700'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.004 0.009' numOctaves='5' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='discrete' tableValues='0 0 0.06 0.14 0.03 0.22 0.05 0.3'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E");
+
+    color-scheme: dark;
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    scroll-behavior: auto; /* Lenis owns scrolling */
+  }
+
+  body {
+    margin: 0;
+    min-height: 100svh;
+    background-color: rgb(var(--ink));
+    color: rgb(var(--ivory));
+    font-family: var(--font-manrope), system-ui, -apple-system, sans-serif;
+    font-size: clamp(0.875rem, 0.82rem + 0.25vw, 1rem);
+    line-height: 1.6;
+    font-synthesis-weight: none;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    overscroll-behavior-y: none;
+    font-variant-ligatures: common-ligatures contextual;
+  }
+
+  /* Warm ivory pages need dark ink. Scoped by an attribute on <main>. */
+  [data-tone='ivory'] {
+    color: rgb(var(--ivory));
+  }
+
+  ::selection {
+    background: rgb(var(--gold) / 0.24);
+    color: rgb(var(--ivory-soft));
+  }
+
+  :focus-visible {
+    outline: 1px solid rgb(var(--gold-light) / 0.7);
+    outline-offset: 4px;
+    border-radius: 1px;
+  }
+
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+    color: inherit;
+  }
+
+  button {
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  img,
+  svg,
+  canvas {
+    display: block;
+    max-width: 100%;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  p,
+  figure,
+  blockquote {
+    margin: 0;
+  }
+
+  ul,
+  ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+}
+
+/* ==========================================================================
+   COMPONENTS
+   ========================================================================== */
+
+@layer components {
+  /* --- Layout ------------------------------------------------------------ */
+  .shell {
+    width: 100%;
+    max-width: 90rem;
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
+
+  .measure {
+    max-width: var(--measure);
+  }
+
+  /* Small caps label — the connective tissue of the whole interface. */
+  .label {
+    font-family: var(--font-manrope), system-ui, sans-serif;
+    font-size: clamp(0.5625rem, 0.52rem + 0.18vw, 0.6875rem);
+    font-weight: 500;
+    letter-spacing: 0.34em;
+    text-transform: uppercase;
+    line-height: 1.6;
+  }
+
+  .label-soft {
+    color: rgb(var(--ivory) / 0.52);
+  }
+
+  /* A hairline rule with a diamond stop — used as a section divider. */
+  .rule {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: rgb(var(--gold) / 0.6);
+  }
+  .rule::before,
+  .rule::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgb(var(--gold) / 0.42) 22%,
+      rgb(var(--gold) / 0.42) 78%,
+      transparent
+    );
+  }
+  .rule > span {
+    font-size: 0.5rem;
+    line-height: 1;
+    opacity: 0.75;
+  }
+
+  /* --- GOLD FOIL ---------------------------------------------------------
+     Simulated antique leaf on paper. Four things sell it:
+       1. a multi-stop metallic ramp (never a two-stop yellow gradient)
+       2. a travelling specular band, scroll- or hover-driven
+       3. a fine grain so the fill is not glassy
+       4. an emboss: dark drop-shadow below, faint light rim above
+     -------------------------------------------------------------------- */
+  .foil {
+    --foil-angle: 102deg;
+    --foil-pos: 50%;
+    position: relative;
+    display: inline-block;
+    background-image:
+      /* specular band */
+      linear-gradient(
+        var(--foil-angle),
+        transparent 0%,
+        rgb(255 246 214 / 0.06) 18%,
+        rgb(255 250 232 / 0.72) var(--foil-pos),
+        rgb(255 246 214 / 0.06) 82%,
+        transparent 100%
+      ),
+      /* the leaf itself */
+      linear-gradient(
+        var(--foil-angle),
+        rgb(var(--gold-shadow)) 0%,
+        rgb(var(--gold-deep)) 12%,
+        rgb(var(--gold-antique)) 26%,
+        rgb(var(--gold-light)) 38%,
+        rgb(var(--gold-pale)) 44%,
+        rgb(var(--gold-light)) 50%,
+        rgb(var(--gold-antique)) 62%,
+        rgb(var(--gold-deep)) 78%,
+        rgb(var(--gold-shadow)) 100%
+      ),
+      /* grain */
+      var(--grain);
+    background-size: 220% 100%, 100% 100%, 180px 180px;
+    background-position: var(--foil-pos) 0, 0 0, 0 0;
+    background-blend-mode: overlay, normal, soft-light;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 1px 0 rgb(var(--gold-shadow) / 0.55))
+      drop-shadow(0 0 26px rgb(var(--gold) / 0.16));
+  }
+
+  /* Embossed into the paper rather than printed on top. */
+  .foil-emboss {
+    --foil-angle: 96deg;
+    filter: drop-shadow(0 1px 0 rgb(255 252 240 / 0.55))
+      drop-shadow(0 -1px 1px rgb(var(--gold-shadow) / 0.45));
+  }
+
+  .foil-shimmer {
+    animation: foil-travel 7.5s var(--ease-silk) infinite;
+  }
+
+  @keyframes foil-travel {
+    0%,
+      100% {
+        --foil-pos: 18%;
+      }
+    50% {
+      --foil-pos: 82%;
+    }
+  }
+
+  /* --- MATERIALS --------------------------------------------------------- */
+
+  /* Handmade ivory paper. Grain + a faint deckle warmth. */
+  .material-ivory {
+    position: relative;
+    background-color: rgb(var(--ivory-soft));
+    background-image:
+      var(--grain),
+      radial-gradient(120% 90% at 50% 0%, rgb(255 253 246 / 0.9), transparent 60%),
+      radial-gradient(140% 120% at 100% 100%, rgb(var(--ivory-deep) / 0.55), transparent 55%);
+    background-blend-mode: multiply, normal, normal;
+    /* Paper carries ink, not light. */
+    color: rgb(var(--ink-warm));
+  }
+
+  /* Deep emerald velvet. Directional sheen + vignette, never flat. */
+  .material-velvet {
+    position: relative;
+    background-color: rgb(var(--emerald-deep));
+    background-image:
+      var(--grain),
+      radial-gradient(
+        90% 70% at 50% 18%,
+        rgb(var(--emerald-rich) / 0.9),
+        transparent 70%
+      ),
+      radial-gradient(
+        120% 100% at 50% 100%,
+        rgb(var(--ink)) 20%,
+        transparent 65%
+      );
+    background-blend-mode: soft-light, normal, normal;
+  }
+
+  /* Cinematic black with a single warm source, low and centred. */
+  .material-cinema {
+    position: relative;
+    background-color: rgb(var(--ink));
+    background-image:
+      var(--grain),
+      radial-gradient(
+        70% 55% at 50% 108%,
+        rgb(var(--gold-deep) / 0.34),
+        transparent 62%
+      ),
+      radial-gradient(
+        100% 70% at 50% -8%,
+        rgb(var(--emerald-rich) / 0.5),
+        transparent 65%
+      );
+    background-blend-mode: soft-light, normal, normal;
+  }
+
+  /* Veiled marble — visible only in the highlights. */
+  .material-marble {
+    position: relative;
+    background-color: rgb(var(--ivory-soft));
+    background-image: var(--marble), var(--grain);
+    background-blend-mode: multiply, multiply;
+    /* Same rule as ivory paper: ink, not light. */
+    color: rgb(var(--ink-warm));
+  }
+
+  /* --- EDGES ------------------------------------------------------------- */
+  .edge-gold {
+    border: 1px solid rgb(var(--gold) / 0.34);
+  }
+  .edge-gold-soft {
+    box-shadow:
+      inset 0 0 0 1px rgb(var(--gold) / 0.2),
+      inset 0 1px 0 rgb(var(--gold-light) / 0.14);
+  }
+
+  /* --- BUTTONS ----------------------------------------------------------- */
+
+  /* An invitation seal, not a web button. */
+  .seal-button {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.9em;
+    padding: 1.05em 2.4em;
+    border-radius: 999px;
+    font-family: var(--font-manrope), system-ui, sans-serif;
+    font-size: clamp(0.5625rem, 0.52rem + 0.18vw, 0.6875rem);
+    font-weight: 500;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    isolation: isolate;
+    color: rgb(var(--gold-light));
+    background-image: linear-gradient(
+      160deg,
+      rgb(var(--gold) / 0.14),
+      rgb(var(--gold) / 0.04) 45%,
+      rgb(var(--gold) / 0.12)
+    );
+    box-shadow:
+      inset 0 0 0 1px rgb(var(--gold) / 0.42),
+      inset 0 1px 0 rgb(var(--gold-light) / 0.22),
+      0 18px 50px -24px rgb(var(--gold) / 0.5);
+    transition:
+      color 0.6s var(--ease-silk),
+      box-shadow 0.7s var(--ease-silk),
+      transform 0.7s var(--ease-silk);
+    will-change: transform;
+  }
+  .seal-button::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    opacity: 0;
+    background: linear-gradient(
+      100deg,
+      transparent 20%,
+      rgb(var(--gold-light) / 0.28) 50%,
+      transparent 80%
+    );
+    transition: opacity 0.7s var(--ease-silk);
+  }
+  .seal-button:hover,
+  .seal-button:focus-visible {
+    color: rgb(var(--gold-pale));
+    box-shadow:
+      inset 0 0 0 1px rgb(var(--gold-light) / 0.6),
+      inset 0 1px 0 rgb(var(--gold-light) / 0.34),
+      0 22px 60px -22px rgb(var(--gold) / 0.66);
+  }
+  .seal-button:hover::after,
+  .seal-button:focus-visible::after {
+    opacity: 1;
+  }
+  .seal-button:active {
+    transform: scale(0.985);
+  }
+
+  /* Ghost variant for dark scenes where a filled seal is too loud. */
+  .seal-button--ghost {
+    color: rgb(var(--ivory) / 0.82);
+    background-image: none;
+    box-shadow: inset 0 0 0 1px rgb(var(--ivory) / 0.24);
+  }
+  .seal-button--ghost:hover {
+    color: rgb(var(--gold-light));
+    box-shadow: inset 0 0 0 1px rgb(var(--gold) / 0.5);
+  }
+
+  /* Understated text action with a gold underline that draws in. */
+  .link-gold {
+    position: relative;
+    display: inline-block;
+    padding-bottom: 0.35em;
+    color: rgb(var(--ivory) / 0.82);
+    transition: color 0.5s var(--ease-silk);
+  }
+  .link-gold::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 1px;
+    background: rgb(var(--gold) / 0.75);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.7s var(--ease-silk);
+  }
+  .link-gold:hover,
+  .link-gold:focus-visible {
+    color: rgb(var(--gold-light));
+  }
+  .link-gold:hover::after,
+  .link-gold:focus-visible::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+
+  /* --- SCENES ------------------------------------------------------------ */
+  .scene {
+    position: relative;
+    width: 100%;
+    overflow: clip;
+  }
+
+  /* Cinematic scenes are fixed-height on mobile so the first paint is instant. */
+  .scene-cinema {
+    min-height: 100svh;
+    display: grid;
+    place-items: center;
+  }
+
+  .scene-pad {
+    padding-block: clamp(5rem, 14vh, 11rem);
+  }
+
+  /* --- REVEAL PRIMITIVES (used by GSAP + CSS) ---------------------------- */
+  .reveal-mask {
+    display: block;
+    overflow: hidden;
+  }
+
+  .reveal-line {
+    display: block;
+    transform: translateY(105%);
+    will-change: transform;
+  }
+
+  /* Split every character, for masked letter reveals. */
+  .split-char {
+    display: inline-block;
+    overflow: hidden;
+    vertical-align: top;
+    padding-block: 0.06em;
+  }
+  .split-char > span {
+    display: inline-block;
+    transform: translateY(110%);
+    will-change: transform;
+  }
+
+  /* --- FORMS ------------------------------------------------------------- */
+  .field {
+    position: relative;
+    display: block;
+  }
+
+  .field > input,
+  .field > textarea,
+  .field > select {
+    width: 100%;
+    padding: 1.35rem 0 0.7rem;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid rgb(var(--ivory) / 0.2);
+    border-radius: 0;
+    color: rgb(var(--ivory));
+    font-family: var(--font-manrope), system-ui, sans-serif;
+    font-size: 0.95rem;
+    letter-spacing: 0.02em;
+    transition: border-color 0.6s var(--ease-silk);
+  }
+  .field > input::placeholder,
+  .field > textarea::placeholder {
+    color: rgb(var(--ivory) / 0.34);
+  }
+  .field > input:focus,
+  .field > textarea:focus,
+  .field > select:focus {
+    outline: none;
+    border-bottom-color: rgb(var(--gold) / 0.75);
+  }
+
+  .field > label {
+    position: absolute;
+    left: 0;
+    top: 1.3rem;
+    pointer-events: none;
+    font-family: var(--font-manrope), system-ui, sans-serif;
+    font-size: 0.6rem;
+    font-weight: 500;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: rgb(var(--ivory) / 0.42);
+    transform-origin: left top;
+    transition:
+      transform 0.5s var(--ease-silk),
+      color 0.5s var(--ease-silk);
+  }
+
+  .field[data-filled='true'] > label,
+  .field > input:focus + label,
+  .field > textarea:focus + label {
+    transform: translateY(-1.05rem) scale(0.78);
+    color: rgb(var(--gold) / 0.9);
+  }
+
+  /* --- NOISE -------------------------------------------------------------
+     One tiny tiled SVG used as a grain layer throughout. Kept inline so it
+     costs no extra request and never 404s.
+     -------------------------------------------------------------------- */
+
+  /* A ring drawing itself in, used by the preloader monogram. */
+  .monogram-ring {
+    stroke-dasharray: 592;
+    stroke-dashoffset: 592;
+    animation: ring-draw 3.4s var(--ease-silk) forwards;
+  }
+
+  @keyframes ring-draw {
+    0% {
+      stroke-dashoffset: 592;
+      opacity: 0;
+    }
+    12% {
+      opacity: 1;
+    }
+    100% {
+      stroke-dashoffset: 0;
+      opacity: 1;
+    }
+  }
+
+  /* --- 2.5D PALACE ------------------------------------------------------
+     Ambient motion for the CSS fallback of the WebGL scene. Kept here so the
+     fallback has no stylesheet of its own, and all of it is switched off by the
+     reduced-motion block at the foot of this file.
+     -------------------------------------------------------------------- */
+  @keyframes shaft-drift {
+    0% {
+      opacity: 0.5;
+      transform: skewX(var(--skew, 0deg)) translateX(-2%);
+    }
+    100% {
+      opacity: 1;
+      transform: skewX(var(--skew, 0deg)) translateX(2%);
+    }
+  }
+
+  @keyframes mote-drift {
+    0% {
+      transform: translate3d(0, 0, 0);
+      opacity: 0.15;
+    }
+    50% {
+      opacity: 0.55;
+    }
+    100% {
+      transform: translate3d(6px, -18px, 0);
+      opacity: 0.12;
+    }
+  }
+
+  @keyframes petal-fall {
+    0% {
+      transform: translate3d(0, -4vh, 0) rotate(0deg);
+      opacity: 0;
+    }
+    8% {
+      opacity: 0.8;
+    }
+    50% {
+      transform: translate3d(22px, 52vh, 0) rotate(220deg);
+    }
+    100% {
+      transform: translate3d(-14px, 108vh, 0) rotate(440deg);
+      opacity: 0;
+    }
+  }
+
+  /* --- SCROLL CUE -------------------------------------------------------
+     A single drop of light travelling down a hairline.
+     -------------------------------------------------------------------- */
+  @keyframes cue-travel {
+    0% {
+      transform: translateY(-100%);
+      opacity: 0;
+    }
+    25% {
+      opacity: 1;
+    }
+    75% {
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(300%);
+      opacity: 0;
+    }
+  }
+
+  .cue-line {
+    animation: cue-travel 2.8s var(--ease-silk) infinite;
+  }
+}
+
+/* ==========================================================================
+   UTILITIES
+   ========================================================================== */
+
+@layer utilities {
+  .grain-layer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: var(--grain);
+    background-size: 180px 180px;
+    mix-blend-mode: soft-light;
+    opacity: 0.5;
+  }
+
+  /* A soft vignette to sink the edges of any scene. */
+  .vignette::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(
+      120% 85% at 50% 45%,
+      transparent 40%,
+      rgb(var(--ink) / 0.72) 100%
+    );
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+  .text-pretty {
+    text-wrap: pretty;
+  }
+
+  /* Tabular numerals — essential for the countdown not to reflow. */
+  .tnum {
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+
+  .no-select {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  /* Scrollable regions that must not advertise a scrollbar. */
+  .no-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+}
+
+/* ==========================================================================
+   GLOBAL SMOOTH SCROLL (Lenis)
+   ========================================================================== */
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+/* The curtain above the page while a scene transition plays. */
+.curtain {
+  position: fixed;
+  inset: 0;
+  z-index: 85;
+  pointer-events: none;
+  transform-origin: top;
+}
+
+/* ==========================================================================
+   REDUCED MOTION
+   Honour it properly: no parallax, no shimmer, no drift — but keep the
+   content, the hierarchy and the interactions legible and usable.
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .reveal-line,
+  .split-char > span {
+    transform: none !important;
+  }
+
+  .foil-shimmer {
+    animation: none !important;
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "name": "Girisha Sagar & Yashaswini — Wedding Invitation",
+  "short_name": "The Wedding",
+  "description": "With the blessings of their families, Girisha Sagar & Yashaswini invite you to celebrate their wedding on 17 October in Kanakapura, Karnataka.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#08080A",
+  "theme_color": "#08080A",
+  "categories": ["lifestyle", "events"],
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ],
+  "shortcuts": [
+    { "name": "RSVP", "url": "/#rsvp" },
+    { "name": "The Gallery", "url": "/#gallery" }
+  ]
+}
