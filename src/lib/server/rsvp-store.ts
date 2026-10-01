@@ -34,6 +34,26 @@ const DATA_DIR = process.env.RSVP_DATA_DIR
 
 const DATA_FILE = path.join(DATA_DIR, 'rsvp.json');
 
+/**
+ * Whether these replies can actually be relied on to still be there tomorrow.
+ *
+ * Serverless platforms hand each deployment a fresh, throwaway filesystem: a
+ * reply written now is readable now, and gone after the next deploy or a cold
+ * start on another instance. That is a silent, data-losing failure — the worst
+ * possible kind — so the admin page is told about it out loud rather than the
+ * family discovering an empty list the week after the wedding.
+ *
+ * Set `RSVP_DATA_DIR` to a mounted volume, or swap this one file for a database,
+ * and this reports `true` on its own.
+ */
+export function storageIsDurable(): boolean {
+  if (process.env.RSVP_DATA_DIR) return true;
+  if (process.env.VERCEL) return false;
+  if (process.env.AWS_LAMBDA_FUNCTION_NAME) return false;
+  if (process.env.NETLIFY) return false;
+  return true;
+}
+
 /** Serialises every write. A queue of one is plenty for a single wedding. */
 let queue: Promise<unknown> = Promise.resolve();
 

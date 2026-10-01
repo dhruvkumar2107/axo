@@ -1,7 +1,13 @@
 import { NextResponse } from 'next/server';
 
 import { summarise, validateSubmission } from '@/lib/rsvp';
-import { add, readAll, remove, toCsv } from '@/lib/server/rsvp-store';
+import {
+  add,
+  readAll,
+  remove,
+  storageIsDurable,
+  toCsv,
+} from '@/lib/server/rsvp-store';
 import { isAdmin, isAllowedOrigin, rateLimit, rateLimitKey } from '@/lib/server/http';
 
 /**
@@ -72,9 +78,10 @@ export async function GET(request: Request) {
     });
   }
 
-  return NextResponse.json({ summary: summarise(records), records }, {
-    headers: { 'Cache-Control': 'no-store' },
-  });
+return NextResponse.json(
+    { summary: summarise(records), records, durable: storageIsDurable() },
+    { headers: { 'Cache-Control': 'no-store' } },
+  );
 }
 
 /* --------------------------------------------------------------------------

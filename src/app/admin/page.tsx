@@ -27,6 +27,8 @@ import { cn } from '@/lib/cn';
 interface Payload {
   summary: ReturnType<typeof summarise>;
   records: RsvpRecord[];
+  /** False on a host whose filesystem is thrown away on every deploy. */
+  durable: boolean;
 }
 
 export default function AdminPage() {
@@ -131,6 +133,22 @@ export default function AdminPage() {
           </form>
         ) : (
           <>
+            {payload.durable ? null : (
+              /*
+                Said plainly, once, at the top of the only page the family reads.
+                An empty guest list that used to have entries in it is a much
+                worse thing to explain after the wedding than a warning now.
+              */
+              <p
+                className="max-w-[64ch] border-l border-burgundy-muted/60 pl-5 font-display text-fluid-sm italic leading-relaxed text-ivory/55"
+                role="status"
+              >
+                Replies are being kept in this deployment&rsquo;s temporary storage.
+                They will be lost on the next deploy — export a CSV regularly, or move
+                the store to a database before guests start replying.
+              </p>
+            )}
+
             <dl className="grid grid-cols-2 gap-5 sm:grid-cols-4">
               <Stat label="Replies" value={payload.summary.responses} />
               <Stat label="Attending" value={payload.summary.attending} />
