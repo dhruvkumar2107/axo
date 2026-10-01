@@ -17,18 +17,22 @@ import { config } from '@/lib/site';
 /**
  * The entry sequence is a state machine, not a set of booleans.
  *
- *   loading ──▶ doors ──▶ entering ──▶ inside
+ *   overture ──▶ doors ──▶ entering ──▶ inside
  *
- * `loading`   Preloader: monogram, names, a discreet progress read-out.
- * `doors`     The palace at night. Monogram, tagline, ENTER THE CELEBRATION.
- * `entering`  Doors swing, light pours out, camera pushes through.
+ * `overture`  The opening. Fully painted from the first byte of HTML — there is
+ *              no loading screen in front of it, because there is nothing left
+ *              to wait for. 3D cross-fades in behind the type when it arrives.
+ * `doors`     The guest pressed ENTER. The palace scene mounts and warms up
+ *              while the opening is still on screen, so no guest ever waits on
+ *              a download in order to see a door open.
+ * `entering`  The scene is live. Doors swing, light pours out, camera pushes in.
  * `inside`    The invitation proper. Smooth scroll unlocks.
  *
  * Everything downstream of `inside` is mounted from the very first frame but
- * held behind an invisible curtain, so typefaces and photography are already
+ * held behind an invisible curtain, so typefaces and composition are already
  * warm by the time the guest is let in — no second loading bar.
  */
-export type Phase = 'loading' | 'doors' | 'entering' | 'inside';
+export type Phase = 'overture' | 'doors' | 'entering' | 'inside';
 
 interface ExperienceValue {
   phase: Phase;
@@ -40,10 +44,10 @@ interface ExperienceValue {
   greeting: string | null;
   /** Entered at least once this session (drives the replay affordance). */
   hasEntered: boolean;
-  /** Move to the palace doors. */
-  goToDoors: () => void;
-  /** Guest pressed ENTER — the doors begin to open. */
+  /** Guest pressed ENTER. Moves to the palace and begins warming the scene. */
   beginEntry: () => void;
+  /** Scene is live and able to play the open — start the doors. */
+  startOpen: () => void;
   /** Doors finished — reveal the invitation. */
   completeEntry: () => void;
   /** True only while the guest is inside, used to gate scroll and audio. */
@@ -57,7 +61,7 @@ export function ExperienceProvider({ children }: { children: ReactNode }) {
   // which avoids a hydration mismatch and a wasted 3D context on weak devices.
   const [profile, setProfile] = useState<DeviceProfile | null>(null);
   const [useWebGL, setUseWebGL] = useState(false);
-  const [phase, setPhase] = useState<Phase>('loading');
+  const [phase, setPhase] = useState<Phase>('overture');
   const [hasEntered, setHasEntered] = useState(false);
 
   // Personalisation is read from the URL rather than threaded through the root
@@ -75,14 +79,20 @@ export function ExperienceProvider({ children }: { children: ReactNode }) {
     setGreeting(slug ? resolveSalutation(slug, config.invites, 'Dear Friends,') : null);
   }, []);
 
-  const goToDoors = useCallback(() => setPhase('doors'), []);
-
   const beginEntry = useCallback(() => {
     setHasEntered(true);
-    setPhase('entering');
+    setPhase('doors');
   }, []);
 
-  const completeEntry = useCallback(() => setPhase('inside'), []);
+  /**
+   * Guarded so a scene that reports ready twice — or reports ready and then
+   * completes at the same instant — cannot skip the `entering` act.
+   */
+  const startOpen = useCallback(() => {
+    setPhase((current) => (current === 'doors' ? 'entering' : current));
+  }, []);
+
+  const completeEntry = useCallback(() => setPhase((current) => (current === 'entering' ? 'inside' : current)), []);
 
   const value = useMemo<ExperienceValue>(
     () => ({
@@ -102,12 +112,12 @@ export function ExperienceProvider({ children }: { children: ReactNode }) {
       tier: profile?.tier ?? 'balanced',
       greeting,
       hasEntered,
-      goToDoors,
       beginEntry,
+      startOpen,
       completeEntry,
       isInside: phase === 'inside',
     }),
-    [phase, profile, useWebGL, greeting, hasEntered, goToDoors, beginEntry, completeEntry],
+    [phase, profile, useWebGL, greeting, hasEntered, beginEntry, startOpen, completeEntry],
   );
 
   return <ExperienceContext.Provider value={value}>{children}</ExperienceContext.Provider>;

@@ -227,7 +227,7 @@ export interface WeddingConfig {
   /** Personalised invite slugs. Empty by default; see /invite/[slug]. */
   invites: Array<{ slug: string; salutation: string }>;
 
-  /** Shown in the preloader and the final scene. */
+  /** Shown in the opening and the final scene. */
   tagline: string;
 }
 

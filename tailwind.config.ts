@@ -50,8 +50,10 @@ const config: Config = {
         },
       },
       fontFamily: {
+        // Two families, both loaded. `--font-editorial` is kept as an alias so a
+        // future face can be introduced without touching every call site.
         display: ['var(--font-cormorant)', 'Didot', 'Bodoni MT', 'serif'],
-        editorial: ['var(--font-playfair)', 'Georgia', 'serif'],
+        editorial: ['var(--font-cormorant)', 'Didot', 'Bodoni MT', 'serif'],
         sans: ['var(--font-manrope)', 'Inter', 'system-ui', 'sans-serif'],
         mono: ['var(--font-mono)', 'ui-monospace', 'monospace'],
       },

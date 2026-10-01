@@ -349,7 +349,8 @@ export function SaveTheDate() {
           <CalendarActions />
 
           {!revealed ? (
-            <button type="button" className="link-gold label" onClick={reveal}>
+            /* Padded to a full 44px touch height without changing the type. */
+            <button type="button" className="link-gold label -my-3 py-3" onClick={reveal}>
               Reveal without scratching
             </button>
           ) : (

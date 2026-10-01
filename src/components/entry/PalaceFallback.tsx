@@ -4,6 +4,7 @@ import { useEffect, useRef, type CSSProperties } from 'react';
 import { gsap } from 'gsap';
 
 import { scroll } from '@/lib/scroll';
+import { afterDelay, once } from '@/lib/frame';
 import { QUALITY_BUDGET, type QualityTier } from '@/lib/perf';
 
 /**
@@ -68,11 +69,21 @@ export function PalaceFallback({ opening, onOpened, onReady, tier }: PalaceFallb
   const petalCount = Math.min(14, Math.round(budget.petals / 8));
 
   /* ======================================================================
-     Readiness: one frame, then tell the parent
+     Readiness: report immediately, do not wait for a frame
+
+     This used to fire from `requestAnimationFrame`, which meant that on a
+     throttled tab the entrance copy never animated in — it stayed at its
+     initial hidden state behind a scene the guest could not dismiss. The
+     component has rendered, so it is ready; the animation is decoration.
      ====================================================================== */
   useEffect(() => {
     const id = requestAnimationFrame(() => onReadyRef.current?.());
-    return () => cancelAnimationFrame(id);
+    // Belt and braces: if no frame ever arrives, still report readiness.
+    const bail = afterDelay(() => onReadyRef.current?.(), 400);
+    return () => {
+      cancelAnimationFrame(id);
+      bail();
+    };
   }, []);
 
   /* ======================================================================
@@ -86,17 +97,23 @@ export function PalaceFallback({ opening, onOpened, onReady, tier }: PalaceFallb
     const ctx = gsap.context(() => {
       if (!opening) return;
 
+      /*
+       * `opened` is guarded so the hand-over to the invitation happens exactly
+       * once, and is scheduled independently of GSAP's frame-driven ticker.
+       */
+      const opened = once(() => onOpenedRef.current());
+
       if (scroll.reduceMotion) {
         // No swing and no parallax: the interior simply brightens, which
         // conveys the same beat without any vestibular cost.
         gsap.to(glowRef.current, { opacity: 1, scale: 1.7, duration: 2.4, ease: 'power2.inOut' });
         gsap.to(shaftRef.current, { opacity: 0.6, duration: 2.4, ease: 'power2.inOut' });
-        window.setTimeout(() => onOpenedRef.current(), 2600);
+        afterDelay(opened, 2600);
         return;
       }
 
       gsap
-        .timeline({ onComplete: () => onOpenedRef.current() })
+        .timeline({ onComplete: opened })
         .to(left, { rotateY: -88, duration: OPEN_SECONDS, ease: 'power2.inOut' }, 0)
         .to(right, { rotateY: 88, duration: OPEN_SECONDS, ease: 'power2.inOut' }, 0)
         .to(
@@ -111,6 +128,9 @@ export function PalaceFallback({ opening, onOpened, onReady, tier }: PalaceFallb
         )
         .to(petalsRef.current, { opacity: 0.9, duration: 2.4, ease: 'sine.out' }, 0.6)
         .to(planeRef.current, { scale: 1.22, duration: OPEN_SECONDS, ease: 'power2.inOut' }, 0);
+
+      // The doors must finish opening even if no frame is ever painted again.
+      afterDelay(opened, (OPEN_SECONDS + 0.6) * 1000);
     }, rootRef);
 
     return () => ctx.revert();

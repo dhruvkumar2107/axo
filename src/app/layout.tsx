@@ -1,41 +1,41 @@
 import type { Metadata, Viewport } from 'next';
-import { Cormorant_Garamond, Manrope, Playfair_Display } from 'next/font/google';
+import { Cormorant_Garamond, Manrope } from 'next/font/google';
 import './globals.css';
 
 import { weddingConfig } from '@/config/wedding.config';
 import { site } from '@/lib/site';
 import { resolveSiteUrl } from '@/lib/server/site-url';
 import { Providers } from '@/components/providers/Providers';
+import NoScript from '@/components/NoScript';
 
 /* ---------------------------------------------------------------------------
    TYPOGRAPHY
-   Three families, three jobs. The display faces are used at large sizes only;
-   the sans never appears above 16px so the two never compete.
+   Two families, two jobs. The serif is used at display sizes only; the sans
+   never appears above 16px, so the two never compete.
+
+   Weights are declared one at a time and only where they are used, because
+   every extra weight is a separate font file on the critical path. Three
+   families with ten weights each was costing ~180KB before first paint; the
+   site now ships the two faces it actually renders.
    --------------------------------------------------------------------------- */
 
 const cormorant = Cormorant_Garamond({
   subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700'],
+  weight: ['300', '400'],
   style: ['normal', 'italic'],
   display: 'swap',
   variable: '--font-cormorant',
   preload: true,
 });
 
-const playfair = Playfair_Display({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800', '900'],
-  style: ['normal', 'italic'],
-  display: 'swap',
-  variable: '--font-playfair',
-  preload: true,
-});
-
 const manrope = Manrope({
   subsets: ['latin'],
-  weight: ['200', '300', '400', '500', '600', '700'],
+  weight: ['300', '500'],
   display: 'swap',
   variable: '--font-manrope',
+  // Not preloaded: the sans only appears in small utility text, and holding the
+  // critical path open for it delays the display face that the guest actually
+  // sees first.
   preload: false,
 });
 
@@ -145,10 +145,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="en-IN"
-      className={`${cormorant.variable} ${playfair.variable} ${manrope.variable}`}
+      className={`${cormorant.variable} ${manrope.variable}`}
       suppressHydrationWarning
     >
       <body className="bg-ink text-ivory antialiased">
+        <NoScript />
         <Providers>{children}</Providers>
       </body>
     </html>

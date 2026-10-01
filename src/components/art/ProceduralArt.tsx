@@ -33,7 +33,7 @@ export function ProceduralArt({ art, tone = 'dark', className }: ProceduralArtPr
   const id = useId().replace(/[^a-zA-Z0-9]/g, '');
   return (
     <div
-      className={`size-full ${tone === 'ivory' ? 'bg-ivory-soft' : 'bg-emerald-deep'} ${className ?? ''}`}
+      className={`relative size-full ${tone === 'ivory' ? 'bg-ivory-soft' : 'bg-emerald-deep'} ${className ?? ''}`}
       data-art={art}
     >
       <svg
@@ -48,8 +48,19 @@ export function ProceduralArt({ art, tone = 'dark', className }: ProceduralArtPr
         </defs>
         <rect width="800" height="1000" fill={`url(#bg-${id})`} />
         {COMPOSITIONS[art](id, tone)}
-        <rect width="800" height="1000" fill={`url(#grain-${id})`} />
       </svg>
+      {/*
+        The film grain is a tiled CSS background rather than an inline SVG
+        filter. As a `feTurbulence` rect it had to be re-rasterised across the
+        whole viewport on the critical path to first paint, which measurably
+        delayed the opening; as a small repeating tile the browser decodes it
+        once and repeats it on the compositor.
+      */}
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 opacity-[0.28] mix-blend-overlay"
+        style={{ backgroundImage: 'var(--grain)', backgroundSize: '180px 180px' }}
+      />
     </div>
   );
 }
@@ -98,12 +109,8 @@ function palette(id: string, tone: 'dark' | 'ivory') {
         <stop offset="1" stopColor="#000000" stopOpacity="0.4" />
       </linearGradient>
 
-      <filter id={`grain-${id}`} x="0" y="0" width="100%" height="100%">
-        <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" stitchTiles="stitch" />
-        <feColorMatrix type="saturate" values="0" />
-      </filter>
-    </>
-  );
+      </>
+    );
 }
 
 /** Shared: the grain overlay, drawn last so it sits over the composition. */

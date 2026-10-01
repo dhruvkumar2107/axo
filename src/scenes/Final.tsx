@@ -22,12 +22,12 @@ import { scroll } from '@/lib/scroll';
  *  palace, and it costs us nothing to let them.
  */
 export function Final() {
-  const { goToDoors } = useExperience();
+  const { beginEntry } = useExperience();
 
   const replay = useCallback(() => {
     scroll.reset();
-    goToDoors();
-  }, [goToDoors]);
+    beginEntry();
+  }, [beginEntry]);
 
   return (
     <section
@@ -86,7 +86,8 @@ export function Final() {
           <ShareActions compact />
         </div>
 
-        <button type="button" className="link-gold label" onClick={replay}>
+        {/* Padded to a full 44px touch height without changing the type. */}
+        <button type="button" className="link-gold label -my-3 py-3" onClick={replay}>
           Walk back through the doors
         </button>
       </div>

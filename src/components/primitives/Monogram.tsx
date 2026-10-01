@@ -6,7 +6,7 @@ import { config } from '@/lib/site';
 /**
  * G × Y — the visual identity of the invitation.
  *
- * Appears in the preloader, the palace doors, the invitation seal, the
+ * Appears in the opening, the palace doors, the invitation seal, the
  * navigation, every transition, the RSVP and the final scene. It must therefore
  * hold up at 14px in a navigation corner and at 40vh in the hero, so it is built
  * from live type rather than a flattened image, and scales as one unit.
@@ -36,7 +36,7 @@ export interface MonogramProps {
   /** Apply the gold foil treatment to the letters. */
   foil?: boolean;
   /** Show the hairline rule and the date, as on the invitation seal. */
-  /** Animate the ring drawing itself in (preloader only). */
+  /** Animate the ring drawing itself in. Used only on the entry sequence. */
   draw?: boolean;
   className?: string;
   /** Accessible label. The visible glyphs read as "G × Y". */

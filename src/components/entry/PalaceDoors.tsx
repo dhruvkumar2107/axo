@@ -2,13 +2,14 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
-import { AnimatePresence, motion } from 'framer-motion';
 
 import { Monogram } from '@/components/primitives/Monogram';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { PalaceFallback } from './PalaceFallback';
 import { useAudio } from '@/lib/audio';
 import { useExperience } from '@/lib/experience';
 import { site } from '@/lib/site';
+import { afterDelay, once } from '@/lib/frame';
 import { lockScroll, unlockScroll } from '@/lib/scroll';
 import { cn } from '@/lib/cn';
 
@@ -28,15 +29,35 @@ import { cn } from '@/lib/cn';
  *  extra, unexplained tap.
  */
 
+/** Duration of the door swing, in seconds. Shared with the 2.5D fallback. */
+const OPEN_SECONDS = 5.5;
+
+/**
+ * The one guarantee this act must never break.
+ *
+ * Whoever swings the doors — WebGL, the 2.5D fallback, or nothing at all — the
+ * guest gets let in. This timer lives here rather than inside the scene because
+ * it must not depend on the scene existing, drawing a frame, or surviving: a
+ * guest who pressed ENTER is never left standing at a closed door.
+ */
+const OPEN_MILLIS = (OPEN_SECONDS + 1.2) * 1000;
+
 export function PalaceDoors() {
-  const { phase, tier, profile, useWebGL, greeting, beginEntry, completeEntry } = useExperience();
-  const { play, cue, needsGesture } = useAudio();
+  const { phase, tier, profile, useWebGL, greeting, startOpen, completeEntry } = useExperience();
+  const { play, cue } = useAudio();
 
   const [demoted, setDemoted] = useState(false);
   const [ready, setReady] = useState(false);
   const noop = useCallback(() => undefined, []);
 
   /**
+   * True while the guest is still reading the opening: this act is mounted and
+   * has built its scene, but it must stay invisible and must not run a frame of
+   * animation. It is a workshop, not a stage.
+   */
+  const warming = phase === 'overture';
+
+  /*
    * Three.js is a large dependency and most guests will never need it: it is
    * loaded only on a device that has already been judged capable of the WebGL
    * scene, and only once that guest has actually chosen it. Until the module
@@ -50,9 +71,24 @@ export function PalaceDoors() {
   useEffect(() => {
     if (!useWebGL || demoted) return;
     let live = true;
-    void import('./PalaceScene').then((module) => {
-      if (live) setWebGLScene(() => module.PalaceScene);
-    });
+    /*
+     * The palace is built while the guest reads the opening, so by the time they
+     * press ENTER the module is already downloaded, parsed and compiled and the
+     * context is created without waiting on the network. This import therefore
+     * resolves from cache in the common case; it exists so that a guest who
+     * decides quickly — or whose device is too slow to have warmed — is never
+     * left waiting on a chunk.
+     */
+    void import('./PalaceScene')
+      .then((module) => {
+        if (live) setWebGLScene(() => module.PalaceScene);
+      })
+      .catch((error) => {
+        // A failed 3D chunk must never strand the guest: fall back to the CSS
+        // palace, which runs the identical timeline.
+        console.warn('[invitation] palace 3D unavailable, using the 2.5D path:', error);
+        if (live) setDemoted(true);
+      });
     return () => {
       live = false;
     };
@@ -60,7 +96,6 @@ export function PalaceDoors() {
 
   const rootRef = useRef<HTMLDivElement>(null);
   const copyRef = useRef<HTMLDivElement>(null);
-  const sealRef = useRef<HTMLDivElement>(null);
   const veilRef = useRef<HTMLDivElement>(null);
 
   const isOpening = phase === 'entering';
@@ -70,13 +105,49 @@ export function PalaceDoors() {
   const useWebglNow = useWebGL && !demoted;
 
   /* ======================================================================
+     Start the open.
+
+     The guest pressed ENTER on the opening; the doors now open by themselves.
+     We wait for the scene to be genuinely able to draw so the swing is not
+     missed, but the wait is bounded by a plain timer rather than by the scene's
+     cooperation — a guest is never left staring at closed doors.
+     ====================================================================== */
+  const openedRef = useRef(false);
+  const launchOpen = useCallback(() => {
+    if (openedRef.current) return;
+    openedRef.current = true;
+    // This gesture is our one chance to satisfy autoplay policy.
+    play();
+    cue('door');
+    startOpen();
+  }, [play, cue, startOpen]);
+
+  useEffect(() => {
+    if (phase !== 'doors') return;
+    /*
+     * If the scene is already warm — which it usually is, because it was built
+     * while the guest read the opening — the effect below opens the moment it
+     * reports it can draw. This timer is only the floor beneath that: it exists
+     * for the case where the scene never reports readiness, and it is
+     * deliberately generous so the swing is never missed.
+     */
+    return afterDelay(launchOpen, 800);
+  }, [phase, launchOpen]);
+
+  /** The moment the scene says it can play, stop waiting. */
+  useEffect(() => {
+    if (phase !== 'doors' || !ready) return;
+    launchOpen();
+  }, [phase, ready, launchOpen]);
+
+  /* ======================================================================
      Copy settles into place once the scene is on screen
      ====================================================================== */
   useEffect(() => {
     if (!ready) return;
     const ctx = gsap.context(() => {
       if (profile.isReducedMotion) {
-        gsap.set([copyRef.current, sealRef.current], { clearProps: 'all' });
+        gsap.set(copyRef.current, { clearProps: 'all' });
         return;
       }
       gsap
@@ -87,26 +158,10 @@ export function PalaceDoors() {
           duration: 1.7,
           stagger: 0.18,
           ease: 'power3.out',
-        })
-        .from(
-          sealRef.current,
-          { scale: 0.88, opacity: 0, duration: 1.8, ease: 'expo.out' },
-          '-=0.9',
-        );
+        });
     }, rootRef);
     return () => ctx.revert();
   }, [ready, profile.isReducedMotion]);
-
-  /* ======================================================================
-     The press
-     ====================================================================== */
-  const onEnter = useCallback(() => {
-    if (isOpening) return;
-    // This gesture is our one chance to satisfy autoplay policy.
-    play();
-    cue('door');
-    beginEntry();
-  }, [isOpening, play, cue, beginEntry]);
 
   /* ======================================================================
      Opening: a warm veil passes over the scene before the invitation appears
@@ -129,27 +184,51 @@ export function PalaceDoors() {
     completeEntry();
   }, [cue, completeEntry]);
 
+  /*
+   * The hand-over, guaranteed.
+   *
+   * Armed the moment the doors begin to swing. Whichever renderer is running
+   * will normally finish first and hand over sooner; this exists so that a lost
+   * WebGL context, a failed fallback, or a device that never delivers a frame
+   * still cannot strand the guest. `once` means the first signal wins and the
+   * second is ignored.
+   */
+  const handOver = useRef(once(handleOpened));
+  useEffect(() => {
+    if (!isOpening) return;
+    return afterDelay(() => handOver.current(), OPEN_MILLIS);
+  }, [isOpening]);
+
   // Nothing scrolls while the guest is at the doors, and the page is released
   // the moment they are through.
   useEffect(() => {
-    if (phase === 'inside' || phase === 'loading') return;
+    if (phase === 'inside' || phase === 'overture') return;
     lockScroll();
     return unlockScroll;
   }, [phase]);
 
   /* ======================================================================
      Leave
+
+     The exit is deliberately CSS rather than GSAP. A transition is advanced by
+     the browser's own compositor rather than by our `requestAnimationFrame`
+     calls, so the doors still dissolve on exactly the kind of device that never
+     delivers a frame — the same environment the hand-over above defends
+     against. Animating the exit with the animation library that *needs* frames
+     would leave the act parked on screen, covering the invitation it just
+     handed over.
      ====================================================================== */
   useEffect(() => {
     if (!isGone) return;
-    const ctx = gsap.context(() => {
-      gsap.to(rootRef.current, {
-        autoAlpha: 0,
-        duration: profile.isReducedMotion ? 0.2 : 1.2,
-        ease: 'power2.inOut',
-      });
-    }, rootRef);
-    return () => ctx.revert();
+    const root = rootRef.current;
+    if (!root) return;
+
+    const fade = profile.isReducedMotion ? 200 : 1200;
+    // Opacity fades; visibility is switched only once the fade has finished, so
+    // the act stops being composited without snapping out early.
+    root.style.transition = `opacity ${fade}ms linear, visibility 0s linear ${fade}ms`;
+    root.style.opacity = '0';
+    root.style.visibility = 'hidden';
   }, [isGone, profile.isReducedMotion]);
 
   return (
@@ -159,19 +238,39 @@ export function PalaceDoors() {
         'fixed inset-0 z-hud overflow-hidden bg-ink',
         isGone && 'pointer-events-none',
       )}
+      // While warming, the whole act is present and working but cannot be seen,
+      // touched, or found by a screen reader — it is not part of the page yet.
+      aria-hidden={warming || undefined}
       data-scene="doors"
+      style={
+        warming
+          ? { visibility: 'hidden', pointerEvents: 'none' }
+          : undefined
+      }
     >
       {/* --- The scene ---------------------------------------------------- */}
       {useWebglNow ? (
         WebGLScene ? (
-          <WebGLScene
-            opening={isOpening}
-            onOpened={handleOpened}
-            onDemote={() => setDemoted(true)}
-            tier={tier}
-            interactive={!profile.isMobile}
-            onReady={() => setReady(true)}
-          />
+          /*
+           * A GPU failure, a lost context or a bug in the scene must demote to
+           * the 2.5D palace rather than blanking the act. The boundary resets
+           * `demoted`, which flips the branch below to the CSS sequence.
+           */
+          <ErrorBoundary
+            label="The palace entrance"
+            onError={() => setDemoted(true)}
+            fallback={null}
+          >
+            <WebGLScene
+              opening={isOpening}
+              onOpened={() => handOver.current()}
+              onDemote={() => setDemoted(true)}
+              tier={tier}
+              interactive={!profile.isMobile}
+              onReady={() => setReady(true)}
+              active={phase === 'doors' || phase === 'entering'}
+            />
+          </ErrorBoundary>
         ) : (
           /*
             The 2.5D palace covers the few hundred milliseconds the 3D module
@@ -183,7 +282,7 @@ export function PalaceDoors() {
       ) : (
         <PalaceFallback
           opening={isOpening}
-          onOpened={handleOpened}
+          onOpened={() => handOver.current()}
           tier={tier}
           onReady={() => setReady(true)}
         />
@@ -221,52 +320,6 @@ export function PalaceDoors() {
           </div>
         </div>
       </div>
-
-      {/* --- The seal ----------------------------------------------------- */}
-      <AnimatePresence>
-        {!isOpening && !isGone ? (
-          <motion.div
-            key="seal"
-            className="absolute inset-x-0 bottom-0 z-20 flex justify-center pb-[max(2.5rem,env(safe-area-inset-bottom))]"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0, transition: { duration: 0.6 } }}
-          >
-            <div ref={sealRef} className="relative">
-              {/* The seal is the invitation itself: a wax disc behind the type. */}
-              <span
-                aria-hidden="true"
-                className="pointer-events-none absolute -inset-x-10 -inset-y-6 rounded-[999px] bg-[radial-gradient(ellipse_at_center,rgba(201,162,39,0.10),transparent_72%)] blur-md"
-              />
-              <button type="button" className="seal-button group" onClick={onEnter}>
-                <span className="relative">
-                  Enter the celebration
-                  <span
-                    aria-hidden="true"
-                    className="absolute -bottom-1 left-0 h-px w-full origin-left scale-x-0 bg-gold-light/70 transition-transform duration-700 ease-silk group-hover:scale-x-100"
-                  />
-                </span>
-              </button>
-            </div>
-          </motion.div>
-        ) : null}
-      </AnimatePresence>
-
-      {/* --- Audio prompt -------------------------------------------------- */}
-      <AnimatePresence>
-        {needsGesture && !isGone ? (
-          <motion.p
-            key="audio-prompt"
-            className="label pointer-events-none absolute inset-x-0 bottom-[max(1.1rem,env(safe-area-inset-bottom))] z-20 px-[var(--gutter)] text-center text-[0.5rem] text-ivory/30"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ delay: 1.6, duration: 1 }}
-          >
-            Sound accompanies this invitation
-          </motion.p>
-        ) : null}
-      </AnimatePresence>
     </div>
   );
 }

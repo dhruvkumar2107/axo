@@ -11,6 +11,7 @@ import {
   createStoneTexture,
 } from './textures';
 import { QUALITY_BUDGET, startFpsWatchdog, type QualityTier } from '@/lib/perf';
+import { afterDelay, once } from '@/lib/frame';
 
 /**
  * ============================================================================
@@ -45,6 +46,8 @@ export interface PalaceSceneProps {
   tier: QualityTier;
   /** Disables the pointer parallax on touch devices. */
   interactive: boolean;
+  /** False once the guest is inside: stops the loop, since nothing is visible. */
+  active: boolean;
 }
 
 /** Duration of the door swing, in seconds. */
@@ -62,6 +65,7 @@ export function PalaceScene({
   onReady,
   tier,
   interactive,
+  active,
 }: PalaceSceneProps) {
   const mountRef = useRef<HTMLDivElement>(null);
   const openingRef = useRef(opening);
@@ -69,6 +73,14 @@ export function PalaceScene({
   /** Late-bound so the effect never needs these in its dependency list. */
   const onDemoteRef = useRef(onDemote);
   const onReadyRef = useRef(onReady);
+  /** Set false once the guest is inside, so the loop costs nothing. */
+  const activeRef = useRef(active);
+  /**
+   * Set by the scene effect once the renderer is live. Used to arm the
+   * frame-independent completion guarantee at the moment the guest presses
+   * ENTER, which is well after this component has mounted.
+   */
+  const openedGuardRef = useRef<(() => void) | null>(null);
 
   // Keep the latest props available to the render loop without reading them
   // during render.
@@ -77,6 +89,7 @@ export function PalaceScene({
     onOpenedRef.current = onOpened;
     onDemoteRef.current = onDemote;
     onReadyRef.current = onReady;
+    activeRef.current = active;
   });
 
   useEffect(() => {
@@ -512,17 +525,17 @@ export function PalaceScene({
       window.addEventListener('pointermove', onPointerMove, { passive: true });
     }
 
-    /* =====================================================================
-       The loop
-       ===================================================================== */
-    const clock = new THREE.Clock();
-    let elapsed = 0;
-    let raf = 0;
-    let openStart = -1;
-    let openProgress = 0;
-    let completed = false;
-    let disposed = false;
-    let announcedReady = false;
+/* =====================================================================
+     The loop
+     ===================================================================== */
+  const clock = new THREE.Clock();
+  let elapsed = 0;
+  let raf = 0;
+  let openStart = -1;
+  let openProgress = 0;
+  let completed = false;
+  let disposed = false;
+  let announcedReady = false;
 
     /** Targets the lights chase, so nothing ever snaps. */
     let interiorTarget = 0.4;
@@ -530,7 +543,32 @@ export function PalaceScene({
 
     const render = () => {
       if (disposed) return;
+      // The next frame is requested *before* the work, so pausing for any reason
+      // — including the act ending — cannot kill the loop permanently.
       raf = requestAnimationFrame(render);
+      if (!activeRef.current) return;
+
+    /*
+     * Guarantees, independent of the frame loop.
+     *
+     * `render()` only runs while the compositor is awake. If frames stop — a
+     * backgrounded tab, a power-saver stall, a saturated main thread — then the
+     * door completion below would never fire and the guest would be stranded at
+     * the doors forever. This is a plain timer precisely because rAF cannot be
+     * relied upon to deliver the hand-over.
+     */
+    const openedGuaranteed = once(() => {
+      completed = true;
+      onOpenedRef.current();
+    });
+    openedGuardRef.current = openedGuaranteed;
+
+    const readyGuaranteed = once(() => {
+      announcedReady = true;
+      onReadyRef.current?.();
+    });
+
+    afterDelay(readyGuaranteed, 900);
 
       // `getDelta()` advances the internal clock, so elapsed must be accumulated
       // by hand — calling `getElapsedTime()` first would swallow the delta.
@@ -565,10 +603,7 @@ export function PalaceScene({
         }
         renderer.toneMappingExposure = 1.05 + eased * 0.22;
 
-        if (openProgress >= 1 && !completed) {
-          completed = true;
-          onOpenedRef.current();
-        }
+        if (openProgress >= 1 && !completed) openedGuaranteed();
       }
 
       /* --- Camera ------------------------------------------------------- */
@@ -619,11 +654,9 @@ export function PalaceScene({
       renderer.render(scene, camera);
 
       // Announce readiness only once a frame has actually been presented, so
-      // the copy above never fades in against an empty canvas.
-      if (!announcedReady) {
-        announcedReady = true;
-        onReadyRef.current?.();
-      }
+      // the copy above never fades in against an empty canvas. The timer above
+      // is the guarantee for when no frame ever arrives.
+      if (!announcedReady) readyGuaranteed();
     };
 
     raf = requestAnimationFrame(render);
@@ -658,7 +691,24 @@ export function PalaceScene({
         mount.removeChild(renderer.domElement);
       }
     };
+  /*
+     * `active` is deliberately absent: it is read through a ref, and putting it
+     * here would tear the whole scene down and rebuild it at the exact moment
+     * the guest presses ENTER — the worst possible time to recompile shaders.
+     */
   }, [tier, interactive]);
+
+  /*
+   * Arm the completion guarantee the instant the sequence starts opening.
+   *
+   * This has to be an effect rather than part of the mount-time setup, because
+   * `opening` is false when the scene is created and only becomes true several
+   * seconds later when the guest presses ENTER.
+   */
+  useEffect(() => {
+    if (!opening) return;
+    return afterDelay(() => openedGuardRef.current?.(), (OPEN_SECONDS + 1.2) * 1000);
+  }, [opening]);
 
   return <div ref={mountRef} className="absolute inset-0" aria-hidden="true" />;
 }

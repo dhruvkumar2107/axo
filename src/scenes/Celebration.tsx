@@ -191,8 +191,9 @@ function EventCard({ event }: { event: WeddingEvent }) {
       <footer className="mt-auto flex flex-col gap-4 pt-2">
         <CalendarActions event={event} compact />
 
+        {/* Padded to a full 44px touch height without changing the type. */}
         <a
-          className={`link-gold self-start text-[0.6rem] font-medium uppercase tracking-[0.26em] ${
+          className={`link-gold -my-3 self-start py-3 text-[0.6rem] font-medium uppercase tracking-[0.26em] ${
             isBurgundy || event.tone === 'emerald' ? '' : 'text-inkwarm/80'
           }`}
           href={event.mapUrl ?? config.location.mapUrl}

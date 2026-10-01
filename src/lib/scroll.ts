@@ -8,8 +8,8 @@
  * the Lenis instance through context and every call site, it is parked here and
  * addressed through functions.
  *
- * `lock()` works even before Lenis has mounted (during the preloader), which is
- * why it touches the document element directly as well as the instance.
+ * `lock()` works even before Lenis has mounted (during the entry sequence), which
+ * is why it touches the document element directly as well as the instance.
  */
 
 type ScrollTarget = string | number | HTMLElement | null | undefined;

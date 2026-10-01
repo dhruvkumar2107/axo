@@ -115,11 +115,13 @@ export const QUALITY_BUDGET: Record<
     godRays: boolean;
     /** Warm rim lighting on the door edges. */
     rimLight: boolean;
+    /** Extra clearcoat lobe on metals. Visually the best, costliest shader. */
+    clearcoat: boolean;
   }
 > = {
-  cinematic: { maxDpr: 2, particles: 900, petals: 220, shadows: true, godRays: true, rimLight: true },
-  balanced: { maxDpr: 1.75, particles: 420, petals: 110, shadows: false, godRays: true, rimLight: true },
-  essential: { maxDpr: 1, particles: 0, petals: 0, shadows: false, godRays: false, rimLight: false },
+  cinematic: { maxDpr: 2, particles: 900, petals: 220, shadows: true, godRays: true, rimLight: true, clearcoat: true },
+  balanced: { maxDpr: 1.75, particles: 420, petals: 110, shadows: false, godRays: true, rimLight: true, clearcoat: true },
+  essential: { maxDpr: 1, particles: 0, petals: 0, shadows: false, godRays: false, rimLight: false, clearcoat: false },
 };
 
 /* ---------------------------------------------------------------------------
