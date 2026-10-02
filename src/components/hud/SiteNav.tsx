@@ -83,8 +83,11 @@ export function SiteNav() {
 
   const go = (target: string) => {
     setOpen(false);
+    // Returning home from the footer is the longest possible journey. Ease it
+    // and the page looks frozen for well over a second, so that one jump.
+    const home = target === 'hero';
     // Let the menu unlock the scroll before we ask it to move.
-    window.setTimeout(() => scrollTo(`#${target}`, -56), 40);
+    window.setTimeout(() => scrollTo(`#${target}`, home ? 0 : -56, home), 40);
   };
 
   return (

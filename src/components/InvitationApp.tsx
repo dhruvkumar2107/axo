@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 
 import { AudioPlayer } from '@/components/hud/AudioPlayer';
+import { BackToTop } from '@/components/hud/BackToTop';
 import { Cursor } from '@/components/hud/Cursor';
 import { SiteNav } from '@/components/hud/SiteNav';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
@@ -123,6 +124,7 @@ export function InvitationApp() {
         >
           <SiteNav />
           <AudioPlayer />
+          <BackToTop />
           <Cursor />
 
           <main id="main">

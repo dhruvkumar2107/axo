@@ -19,7 +19,7 @@ interface ScrollController {
   detach: () => void;
   lock: () => void;
   unlock: () => void;
-  scrollTo: (target: ScrollTarget, offset?: number) => void;
+  scrollTo: (target: ScrollTarget, offset?: number, immediate?: boolean) => void;
   /** Snap to the top instantly, used when the entry sequence completes. */
   reset: () => void;
   reduceMotion: boolean;
@@ -74,18 +74,34 @@ function controller(): ScrollController {
       lenis?.start();
     },
 
-    scrollTo(target, offset = 0) {
+    /**
+     * `immediate` jumps instead of easing. It matters most for the long haul
+     * back to the top: smoothing across sixteen thousand pixels takes over a
+     * second and a half and reads as a frozen page, so a tap on "home" from the
+     * footer should just arrive.
+     */
+    scrollTo(target, offset = 0, immediate = false) {
+      const jump = immediate || prefersReduced;
+
       if (!lenis) {
         // Before Lenis exists, fall back to native scrolling.
         if (typeof window === 'undefined') return;
         const node =
           typeof target === 'string' ? document.querySelector(target) : target;
         if (node instanceof HTMLElement) {
-          window.scrollTo({ top: node.offsetTop + offset, behavior: 'smooth' });
+          window.scrollTo({
+            top: Math.max(0, node.offsetTop + offset),
+            behavior: jump ? 'auto' : 'smooth',
+          });
         }
         return;
       }
-      lenis.scrollTo(target as never, { offset, duration: 1.6 });
+
+      lenis.scrollTo(target as never, {
+        offset,
+        duration: jump ? 0 : 1.6,
+        immediate: jump,
+      });
     },
 
     reset() {
@@ -102,5 +118,5 @@ export const scroll = controller();
 /** Convenience: free-floating calls that read better at the call site. */
 export const lockScroll = () => scroll.lock();
 export const unlockScroll = () => scroll.unlock();
-export const scrollTo = (target: ScrollTarget, offset?: number) =>
-  scroll.scrollTo(target, offset);
+export const scrollTo = (target: ScrollTarget, offset?: number, immediate?: boolean) =>
+  scroll.scrollTo(target, offset, immediate);
