@@ -12,13 +12,11 @@ import { scroll } from '@/lib/scroll';
  *  SCENE 07 — THE DESTINATION
  * ============================================================================
  *
- *  Kanakapura is the one place the family has confirmed, so this scene is built
- *  entirely around it and around the only truthful things we can say: where it
- *  is, and that it is a chosen place rather than a convenient one.
+ *  The confirmed venue and street address are presented here with a direct map
+ *  link, so guests can move from the cinematic invitation to practical details.
  *
- *  No venue is named, because none has been given to us. The map is a stylised
- *  drawing, not an embedded Google tile — which keeps the scene fast, private
- *  and on-palette — but it is a real link to the real coordinates.
+ *  The map is a stylised drawing, not an embedded Google tile — which keeps the
+ *  scene fast, private and on-palette — but its link opens the named venue.
  */
 
 export function Destination() {
@@ -90,7 +88,7 @@ export function Destination() {
         {/* --- The copy --------------------------------------------------- */}
         <div className="flex flex-col gap-7">
           <SceneHeading label="The Destination" tone="ivory" align="left">
-            <span id="destination-heading">{config.location.city}, {config.location.state}</span>
+            <span id="destination-heading">{config.location.venue}</span>
           </SceneHeading>
 
           <p className="measure text-pretty font-display text-fluid-lg font-light leading-relaxed fg-paper">
@@ -98,17 +96,14 @@ export function Destination() {
           </p>
 
           <dl className="flex flex-col gap-5 border-t border-gold-antique/25 pt-7">
+            <Row label="Venue" value={config.location.venue} />
+            <Row label="Address" value={config.location.address} />
             <Row label="City" value={config.location.city} />
             <Row label="Region" value={`${config.location.state}, ${config.location.country}`} />
-            <Row
-              label="Nearest airport"
-              value="Bengaluru (Kempegowda International)"
-            />
-            <Row label="Exact venue" value="To be announced" muted />
           </dl>
 
           <p className="label fg-paper-muted">
-            Directions will be shared closer to the date
+            Near Pattanagere Metro Station
           </p>
         </div>
       </div>
@@ -121,7 +116,7 @@ function Row({ label, value, muted = false }: { label: string; value: string; mu
     <div className="flex items-baseline justify-between gap-6">
       <dt className="label fg-paper-faint shrink-0">{label}</dt>
       <dd
-        className={`text-right font-display text-fluid-md ${
+        className={`min-w-0 break-words text-right font-display text-fluid-md ${
           muted ? 'italic fg-paper-muted' : 'fg-paper'
         }`}
       >

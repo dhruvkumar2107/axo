@@ -32,9 +32,9 @@ export default function Error({
       <p className="label text-gold/60">{site.monogramLabel}</p>
 
       <h1 className="font-display text-fluid-2xl font-light leading-[1.1] text-ivory">
-        {site.namesStacked.groom}
-        <span className="mx-3 text-gold/70">&amp;</span>
         {site.namesStacked.bride}
+        <span className="mx-3 text-gold/70">×</span>
+        {site.namesStacked.groom}
       </h1>
 
       <div className="flex flex-col items-center gap-3">

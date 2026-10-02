@@ -263,7 +263,7 @@ export function SaveTheDate() {
       />
 
       <SceneHeading label="Save the date" tone="ivory" className="mx-auto">
-        <span id="save-the-date-heading">The seventeenth of October</span>
+        <span id="save-the-date-heading">{site.dateLong ?? site.dateLabel}</span>
       </SceneHeading>
 
       {/* --- The card --------------------------------------------------- */}

@@ -1,4 +1,4 @@
-# Girisha Sagar & Yashaswini — digital wedding invitation
+# Yashaswini Manjunath × Sagar Girisha — digital wedding invitation
 
 A cinematic, mobile-first wedding invitation. A palace you walk through, an
 editorial invitation, a date you scratch to reveal, the day's details, and an
@@ -33,22 +33,23 @@ the date, the location, the RSVP functions, and the copy are all read from it.
 Nothing else in the codebase hardcodes a wedding fact.
 
 ```ts
-couple: { groom, bride, monogram }
-date:   { day, month, year, weekday, assumeNextOccurrence }
-location: { venue, city, state }
-rsvp:   { enabled, maxGuestsPerReply, functions: [...] }
+meta:     { bride, groom, brideCredentials, groomCredentials, monogram }
+date:     { day, month, year, assumeNextOccurrence }
+location: { venue, address, city, state, country, mapUrl }
+events:   [{ name, dateLabel, startsAt, endsAt, timeLabel, venue, address }]
 invites: [{ slug, salutation }]   // personalised /invite/<slug> links
 ```
 
 ### The year
 
-`date.year` is `null` on purpose. The day is confirmed; the year is not, and an
-invitation should not guess. Leave `assumeNextOccurrence: true` and the
-countdown, the calendar file and the Google Calendar link all resolve to the
-next 17 October — while every visible string stays "17 October", with no year
-printed anywhere.
+The wedding date is confirmed as Thursday, 26 November 2026. Its year is set in
+`date.year`, and the countdown and calendar links use the confirmed Muhurtham
+start time.
 
-Set `year` once it is known and it appears on its own.
+The celebration scene lists Paidimudupu Shastram, reception and wedding in
+chronological order; their dates, times and venue are configured in `events`.
+The venue is Poornima Palace, Devam Hall, 36/2, Mysore Road, near Pattanagere
+Metro Station, Rajarajeshwari Nagar, Bengaluru.
 
 ### Personalised links
 

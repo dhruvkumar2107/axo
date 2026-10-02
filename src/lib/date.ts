@@ -1,10 +1,8 @@
 /**
  * Date utilities.
  *
- * The wedding year is intentionally unconfirmed (`date.year === null`). These
- * helpers resolve it *once*, in a single place, so that the countdown, the
- * calendar downloads and the share text can all agree with one another — while
- * never printing a year the family has not confirmed.
+ * These helpers resolve the wedding date once, in a single place, so the
+ * countdown, calendar downloads and printed copy all agree.
  */
 
 export const MONTHS = [
@@ -148,12 +146,12 @@ export function countdownFrom(target: Date, now: Date = new Date()): CountdownPa
   return { total, days, hours, minutes, seconds, elapsed: total === 0 };
 }
 
-/** `17 October` — never includes a year, so nothing unconfirmed is printed. */
-export function formatDateLabel(day: number, month: string): string {
-  return `${day} ${month}`;
+/** Include the year only when it is confirmed. */
+export function formatDateLabel(day: number, month: string, year: number | null = null): string {
+  return `${day} ${month}${year === null ? '' : ` ${year}`}`;
 }
 
-/** `Saturday, 17 October 2026` — only used where a year is explicitly shown. */
+/** `Thursday, 26 November 2026`. */
 export function formatLongDate(date: Date): string {
   const weekday = date.toLocaleDateString('en-GB', { weekday: 'long' });
   return `${weekday}, ${date.getDate()} ${MONTHS[date.getMonth()]} ${date.getFullYear()}`;

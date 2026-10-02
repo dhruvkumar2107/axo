@@ -47,9 +47,9 @@ const manrope = Manrope({
    Without this, a first deploy on a fresh hostname previews as `localhost`.
    --------------------------------------------------------------------------- */
 
-const title = `${site.namesStacked.groom} & ${site.namesStacked.bride} — Wedding Invitation`;
+const title = `${site.names} — Wedding Invitation`;
 
-const description = `With the blessings of their families, ${site.namesStacked.groom} & ${site.namesStacked.bride} invite you to celebrate their wedding on ${site.dateLabel} in ${site.city}, ${weddingConfig.location.state}.`;
+const description = `${weddingConfig.invitation.openingLine} invite you to celebrate the wedding of ${site.names} on ${site.dateLabel} at ${weddingConfig.location.venue}, ${site.city}.`;
 
 /**
  * Rendered per request so the absolute origin can come from the request itself.

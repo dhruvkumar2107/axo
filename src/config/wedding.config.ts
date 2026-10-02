@@ -58,15 +58,15 @@ export interface WeddingEvent {
   name: string;
   /** Roman-numeral-ish overline shown above the name. */
   numeral: string;
-  /** Date as it should be printed, e.g. "17 October". Null → to be announced. */
+  /** Date as it should be printed, e.g. "26 November 2026". */
   dateLabel: string | null;
-  /** ISO start datetime including offset, e.g. "2026-10-17T18:30:00+05:30". */
+  /** ISO start datetime including offset, e.g. "2026-11-26T08:00:00+05:30". */
   startsAt: string | null;
   /** End datetime, used for calendar duration. */
   endsAt: string | null;
   /** Printed time window, e.g. "6:30 PM onwards". */
   timeLabel: string | null;
-  /** Printed venue. Null → the generic Kanakapura line is used. */
+  /** Printed venue. Null → the configured destination is used. */
   venue: string | null;
   /** Optional venue address line. */
   address: string | null;
@@ -84,6 +84,8 @@ export interface WeddingConfig {
   meta: {
     bride: string;
     groom: string;
+    brideCredentials: string;
+    groomCredentials: string;
     /** Two-letter monogram used as the visual identity throughout the site. */
     monogram: string;
     /** Monogram separator — a middot-multiply, as engraved on a seal. */
@@ -96,11 +98,7 @@ export interface WeddingConfig {
     /**
      * Year of the wedding.
      *
-     * Left `null` because it has not been confirmed. The site does NOT guess a
-     * year for printing — instead `resolveWeddingYear()` computes the next
-     * occurrence of the 17th of October purely so that the live countdown and
-     * the calendar downloads remain functional. Set this to the real year
-     * (e.g. 2026) the moment it is confirmed and every derived value follows.
+     * Confirmed year, printed anywhere the date appears.
      */
     year: number | null;
     /** Allow the countdown to target the next occurrence when `year` is null. */
@@ -113,10 +111,12 @@ export interface WeddingConfig {
     city: string;
     state: string;
     country: string;
-    /** Full printed location line, e.g. "Kanakapura, Karnataka, India". */
-    label: string;
-    /** Google Maps search URL for the city. Replace with an exact venue map. */
-    mapUrl: string;
+  venue: string;
+  address: string;
+  /** Short printed location line, e.g. "Poornima Palace, Devam Hall, Bengaluru". */
+  label: string;
+  /** Google Maps search URL for the venue. */
+  mapUrl: string;
     /** Coordinates used by the stylised map card. Null → derived from mapUrl. */
     coordinates: { lat: number; lng: number } | null;
     /** Short editorial paragraph about the destination. */
@@ -233,49 +233,83 @@ export interface WeddingConfig {
 
 export const weddingConfig: WeddingConfig = {
   meta: {
-    bride: 'Yashaswini',
-    groom: 'Girisha Sagar',
-    monogram: 'GY',
+    bride: 'Yashaswini Manjunath',
+    groom: 'Sagar Girisha',
+    brideCredentials: 'Chi. Sow. · B.Pharm, M.Pharm',
+    groomCredentials: 'Chi. Ry. · B.Pharm, M.Pharm (Ph.D.)',
+    monogram: 'YS',
     monogramGlyph: '\u00D7',
   },
 
   date: {
-    day: 17,
-    month: 'October',
-    year: null,
-    assumeNextOccurrence: true,
+    day: 26,
+    month: 'November',
+    year: 2026,
+    assumeNextOccurrence: false,
     timezoneLabel: 'IST',
   },
 
   location: {
-    city: 'Kanakapura',
+    city: 'Bengaluru',
     state: 'Karnataka',
     country: 'India',
-    label: 'Kanakapura, Karnataka, India',
-    mapUrl: 'https://www.google.com/maps/search/?api=1&query=Kanakapura%2C%20Karnataka',
-    coordinates: { lat: 12.5196, lng: 77.0215 },
-    note: 'Two hours from the city, wrapped in coffee country, mist and quiet. A place chosen for its stillness.',
+    venue: 'Poornima Palace, Devam Hall',
+    address: '36/2, Mysore Road, Near Pattanagere Metro Station, Rajarajeshwari Nagar, Bengaluru',
+    label: 'Poornima Palace, Devam Hall, Bengaluru',
+    mapUrl: 'https://www.google.com/maps/search/?api=1&query=Poornima+Palace+Devam+Hall+36%2F2+Mysore+Road+Bengaluru',
+    coordinates: null,
+    note: 'Join us at Poornima Palace, Devam Hall, in Rajarajeshwari Nagar, Bengaluru.',
   },
 
   invitation: {
-    openingLine: 'Together with their families',
-    body: 'invite you to celebrate the wedding of',
-    closingLine: 'in Kanakapura',
-    blessingsLine: 'With the blessings of our families',
+    openingLine: 'Smt. C. Vinodhini Manjunath & Sri N. Manjunath',
+    body: 'invite you with family and friends to the auspicious occasion of the marriage of their daughter',
+    closingLine: 'At Poornima Palace, Devam Hall, Bengaluru',
+    blessingsLine: 'Sri Lakshmi Venkateshwara Swamy Prasanna · Sri Manna Venkateshwara Swamy Prasanna',
   },
 
   events: [
     {
+      id: 'paidimudupu',
+      name: 'Paidimudupu Shastram',
+      numeral: 'I',
+      dateLabel: 'Wednesday, 25 November 2026',
+      startsAt: '2026-11-25T14:00:00+05:30',
+      endsAt: null,
+      timeLabel: '2:00 PM',
+      venue: 'Poornima Palace, Devam Hall',
+      address: '36/2, Mysore Road, Near Pattanagere Metro Station, Rajarajeshwari Nagar, Bengaluru',
+      mapUrl: 'https://www.google.com/maps/search/?api=1&query=Poornima+Palace+Devam+Hall+36%2F2+Mysore+Road+Bengaluru',
+      dressCode: null,
+      description: null,
+      tone: 'burgundy',
+    },
+    {
+      id: 'reception',
+      name: 'Reception',
+      numeral: 'II',
+      dateLabel: 'Wednesday, 25 November 2026',
+      startsAt: '2026-11-25T18:30:00+05:30',
+      endsAt: null,
+      timeLabel: '6:30 PM onwards',
+      venue: 'Poornima Palace, Devam Hall',
+      address: '36/2, Mysore Road, Near Pattanagere Metro Station, Rajarajeshwari Nagar, Bengaluru',
+      mapUrl: 'https://www.google.com/maps/search/?api=1&query=Poornima+Palace+Devam+Hall+36%2F2+Mysore+Road+Bengaluru',
+      dressCode: null,
+      description: null,
+      tone: 'emerald',
+    },
+    {
       id: 'wedding',
       name: 'The Wedding',
-      numeral: 'I',
-      dateLabel: '17 October',
-      startsAt: null,
-      endsAt: null,
-      timeLabel: null,
-      venue: null,
-      address: null,
-      mapUrl: null,
+      numeral: 'III',
+      dateLabel: 'Thursday, 26 November 2026',
+      startsAt: '2026-11-26T08:00:00+05:30',
+      endsAt: '2026-11-26T09:00:00+05:30',
+      timeLabel: '8:00 AM – 9:00 AM · Dhanur Lagna',
+      venue: 'Poornima Palace, Devam Hall',
+      address: '36/2, Mysore Road, Near Pattanagere Metro Station, Rajarajeshwari Nagar, Bengaluru',
+      mapUrl: 'https://www.google.com/maps/search/?api=1&query=Poornima+Palace+Devam+Hall+36%2F2+Mysore+Road+Bengaluru',
       dressCode: null,
       description: null,
       tone: 'ivory',
@@ -289,9 +323,9 @@ export const weddingConfig: WeddingConfig = {
     //   id: 'mehendi',
     //   name: 'Mehendi',
     //   numeral: 'II',
-    //   dateLabel: '15 October',
-    //   startsAt: '2026-10-15T16:00:00+05:30',
-    //   endsAt:   '2026-10-15T20:00:00+05:30',
+    //   dateLabel: 'Monday, 23 November 2026',
+    //   startsAt: '2026-11-23T16:00:00+05:30',
+    //   endsAt:   '2026-11-23T20:00:00+05:30',
     //   timeLabel: '4:00 PM onwards',
     //   venue: 'To be added',
     //   address: null,
@@ -333,7 +367,7 @@ export const weddingConfig: WeddingConfig = {
     {
       index: '04',
       chapter: 'The Forever',
-      title: 'The 17th of October',
+      title: 'The 26th of November',
       body: 'Everything that came before, gathered into a single day — with the people who made them who they are.',
       src: null,
       alt: 'The couple',
@@ -369,16 +403,16 @@ export const weddingConfig: WeddingConfig = {
   },
 
   family: {
-    brideFamily: [],
-    groomFamily: [],
-    note: null,
+    brideFamily: ['Smt. C. Vinodhini Manjunath', 'Sri N. Manjunath'],
+    groomFamily: ['Smt. Bharathi B.S.', 'Sri Girisha B.K.'],
+    note: 'With blessings from Late Smt. Lokamma & Late Sri Narasimhaiah Naidu, and Smt. Mangayarkarasi & Sri Late Chandrashekar Naidu.',
   },
 
   music: {
     source: '',
     fallback: '',
     title: 'Ambience',
-    subtitle: 'A celebration in Kanakapura',
+    subtitle: 'A celebration in Bengaluru',
     loop: true,
     volume: 0.34,
   },
@@ -392,7 +426,7 @@ export const weddingConfig: WeddingConfig = {
 
   countdown: {
     heading: 'The celebration begins in',
-    targetIso: null,
+    targetIso: '2026-11-26T08:00:00+05:30',
   },
 
   rsvp: {
@@ -410,7 +444,7 @@ export const weddingConfig: WeddingConfig = {
     heading: 'Share the invitation',
     whatsappMessage:
       'With great joy, we invite you to celebrate the wedding of {names} on {date} in {location}. {url}',
-    shareText: 'Girisha Sagar & Yashaswini — 17 October, Kanakapura',
+    shareText: 'Yashaswini Manjunath × Sagar Girisha — 26 November 2026, Poornima Palace, Bengaluru',
   },
 
   nav: [

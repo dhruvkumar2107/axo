@@ -50,16 +50,17 @@ const countdownMoment = (() => {
 })();
 
 export const site: SiteCopy = {
-  names: `${cfg.meta.groom} & ${cfg.meta.bride}`,
+  names: `${cfg.meta.bride} × ${cfg.meta.groom}`,
   namesStacked: { groom: cfg.meta.groom, bride: cfg.meta.bride },
   monogram: cfg.meta.monogram,
   monogramLabel: `${cfg.meta.monogram} ${cfg.meta.monogramGlyph} ${cfg.meta.monogram}`,
-  dateLabel: formatDateLabel(cfg.date.day, cfg.date.month),
+  dateLabel: formatDateLabel(cfg.date.day, cfg.date.month, cfg.date.year),
   dateLong: dateMoment
     ? dateMoment.date.toLocaleDateString('en-GB', {
         weekday: 'long',
         day: 'numeric',
         month: 'long',
+        year: 'numeric',
       })
     : null,
   dateYear: dateMoment?.year ?? null,

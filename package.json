@@ -1,8 +1,8 @@
 {
-  "name": "girisha-yashaswini-invitation",
+  "name": "yashaswini-sagar-wedding-invitation",
   "version": "1.0.0",
   "private": true,
-  "description": "A cinematic digital wedding invitation for Girisha Sagar & Yashaswini — 17 October, Kanakapura.",
+  "description": "A cinematic digital wedding invitation for Yashaswini Manjunath × Sagar Girisha — 26 November 2026, Bengaluru.",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

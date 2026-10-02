@@ -36,7 +36,7 @@ function buildMetadata(slug: string): Metadata {
 
   return {
     title,
-    description: `${weddingConfig.invitation.openingLine}, ${site.namesStacked.groom} & ${site.namesStacked.bride} invite you to celebrate their wedding on ${site.dateLabel} in ${site.city}, ${weddingConfig.location.state}.`,
+    description: `${weddingConfig.invitation.openingLine} invite you to celebrate the wedding of ${site.names} on ${site.dateLabel} at ${weddingConfig.location.venue}, ${site.city}.`,
     // Personalised links address households, not search engines. They point
     // their canonical at the invitation itself, which is the page that should
     // ever appear in a result.

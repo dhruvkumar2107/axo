@@ -23,10 +23,10 @@ const SIZE_MAP: Record<MonogramSize, { text: string; ring: number; gap: string }
   hero: { text: 'text-[clamp(3.5rem,15vw,11rem)]', ring: 0, gap: 'gap-[0.14em]' },
 };
 
-/** `GY` → `{ first: 'G', second: 'Y' }`, padding defensively. */
+/** `YS` → `{ first: 'Y', second: 'S' }`, padding defensively. */
 function readMonogram(monogram: string): { first: string; second: string } {
   const chars = monogram.replace(/[^A-Za-z]/g, '').toUpperCase().split('');
-  return { first: chars[0] ?? 'G', second: chars[1] ?? chars[0] ?? 'Y' };
+  return { first: chars[0] ?? 'Y', second: chars[1] ?? chars[0] ?? 'S' };
 }
 
 export interface MonogramProps {
@@ -46,7 +46,7 @@ export interface MonogramProps {
   /** Animate the ring drawing itself in. Used only on the entry sequence. */
   draw?: boolean;
   className?: string;
-  /** Accessible label. The visible glyphs read as "G × Y". */
+  /** Accessible label. The visible glyphs use the configured couple initials. */
   label?: string;
 }
 

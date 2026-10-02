@@ -49,11 +49,11 @@ export function Blessings() {
 
         {hasNames ? (
           <div className="grid w-full grid-cols-1 gap-[clamp(2rem,6vw,4rem)] pt-4 sm:grid-cols-2">
-            {groomFamily.length > 0 ? (
-              <FamilyColumn title={site.namesStacked.groom} names={groomFamily} />
-            ) : null}
             {brideFamily.length > 0 ? (
               <FamilyColumn title={site.namesStacked.bride} names={brideFamily} />
+            ) : null}
+            {groomFamily.length > 0 ? (
+              <FamilyColumn title={site.namesStacked.groom} names={groomFamily} />
             ) : null}
           </div>
         ) : (

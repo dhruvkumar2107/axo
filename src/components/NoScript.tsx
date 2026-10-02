@@ -34,7 +34,7 @@ export default function NoScript() {
             fontFamily: 'system-ui, sans-serif',
           }}
         >
-          GIRISHA SAGAR &nbsp;×&nbsp; YASHASWINI
+          YASHASWINI MANJUNATH &nbsp;×&nbsp; SAGAR GIRISHA
         </p>
         <h1
           style={{
@@ -45,7 +45,7 @@ export default function NoScript() {
             letterSpacing: '0.04em',
           }}
         >
-          17 October
+          26 November 2026
         </h1>
         <p
           style={{
@@ -55,7 +55,7 @@ export default function NoScript() {
             fontFamily: 'system-ui, sans-serif',
           }}
         >
-          KANAKAPURA, KARNATAKA
+          POORNIMA PALACE, DEVAM HALL &middot; BENGALURU
         </p>
         <p
           style={{
@@ -67,7 +67,7 @@ export default function NoScript() {
             lineHeight: 1.6,
           }}
         >
-          A celebration of love, family and forever.
+          Muhurtham 8:00–9:00 a.m. · Dhanur Lagna
         </p>
         <p
           style={{

@@ -37,13 +37,13 @@ export default function GlobalError({
       >
         <main role="alert">
           <p style={{ letterSpacing: '0.42em', fontSize: '0.75rem', opacity: 0.7 }}>
-            GIRISHA SAGAR &amp; YASHASWINI
+            YASHASWINI MANJUNATH &times; SAGAR GIRISHA
           </p>
           <h1 style={{ fontWeight: 300, fontSize: '2rem', margin: '1.25rem 0' }}>
-            17 October
+            26 November 2026
           </h1>
           <p style={{ opacity: 0.7, letterSpacing: '0.16em', fontSize: '0.75rem' }}>
-            KANAKAPURA, KARNATAKA
+            POORNIMA PALACE, DEVAM HALL · BENGALURU
           </p>
           <button
             type="button"

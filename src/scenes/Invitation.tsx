@@ -195,14 +195,16 @@ export function Invitation() {
               <div className="flex flex-col items-center gap-4 text-center">
                 <div className="flex flex-col items-center gap-1.5">
                   <p className="foil-ink font-display text-[clamp(1.35rem,5.4vw,2rem)] font-light leading-tight">
-                    {site.namesStacked.groom}
+                    {site.namesStacked.bride}
                   </p>
+                  <span className="label text-[0.45rem] fg-paper-muted">{config.meta.brideCredentials}</span>
                   <span aria-hidden="true" className="font-display text-gold-antique">
                     {config.meta.monogramGlyph}
                   </span>
                   <p className="foil-ink font-display text-[clamp(1.35rem,5.4vw,2rem)] font-light leading-tight">
-                    {site.namesStacked.bride}
+                    {site.namesStacked.groom}
                   </p>
+                  <span className="label text-[0.45rem] fg-paper-muted">{config.meta.groomCredentials}</span>
                 </div>
 
                 <span aria-hidden="true" className="rule w-full">
@@ -250,7 +252,7 @@ export function Invitation() {
                   <p className="foil-ink font-display text-[clamp(1.5rem,6vw,2.25rem)] font-light uppercase tracking-[0.16em]">
                     {site.dateLabel}
                   </p>
-                  <p className="label fg-paper-muted">{config.location.label}</p>
+                  <p className="label fg-paper-muted">{config.location.venue}</p>
                 </div>
 
                 <p className="max-w-[26ch] font-display text-[clamp(0.8rem,3.2vw,0.95rem)] italic fg-paper-muted">

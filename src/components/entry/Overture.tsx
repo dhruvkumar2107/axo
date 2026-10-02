@@ -209,8 +209,9 @@ export function Overture({ stageReady, onStageReady }: OvertureProps) {
               data-rise
               className="foil foil-shimmer font-display font-light uppercase leading-[1.02] tracking-[0.03em] text-fluid-2xl"
             >
-              {site.namesStacked.groom}
+              {site.namesStacked.bride}
             </h1>
+            <p data-rise className="label fg-night-muted">{config.meta.brideCredentials}</p>
             <p data-rise className="label fg-brass-muted" aria-hidden="true">
               {config.meta.monogramGlyph}
             </p>
@@ -218,16 +219,19 @@ export function Overture({ stageReady, onStageReady }: OvertureProps) {
               data-rise
               className="foil foil-shimmer font-display font-light uppercase leading-[1.02] tracking-[0.03em] text-fluid-2xl"
             >
-              {site.namesStacked.bride}
+              {site.namesStacked.groom}
             </p>
+            <p data-rise className="label fg-night-muted">{config.meta.groomCredentials}</p>
           </div>
 
-          {/* 17 October · Kanakapura, Karnataka & Celebration Tagline */}
           <div data-rise className="mt-[clamp(0.35rem,1svh,0.75rem)] flex flex-col items-center gap-1 text-center">
             <p className="label tracking-[0.26em] text-[clamp(0.6rem,0.85vw,0.72rem)] text-gold-light">
-              17 OCTOBER
+              {site.dateLabel.toUpperCase()}
               <span className="mx-2 fg-brass-muted">&middot;</span>
-              KANAKAPURA, KARNATAKA
+              {config.location.venue.toUpperCase()}
+            </p>
+            <p className="label tracking-[0.2em] text-[clamp(0.55rem,0.75vw,0.65rem)] fg-night-muted">
+              {config.location.city.toUpperCase()}, {config.location.state.toUpperCase()}
             </p>
             <p className="font-display italic text-[clamp(0.8rem,1.3svh,0.98rem)] fg-night-muted tracking-wide text-balance max-w-[28ch]">
               A celebration of love, family and forever.
@@ -309,10 +313,10 @@ function EmbossedMonogram() {
   );
 }
 
-/** `GY` → first and second letters. */
+/** `YS` → first and second letters. */
 function readMonogram(monogram: string): { first: string; second: string } {
   const chars = monogram.replace(/[^A-Za-z]/g, '').toUpperCase().split('');
-  return { first: chars[0] ?? 'G', second: chars[1] ?? chars[0] ?? 'Y' };
+  return { first: chars[0] ?? 'Y', second: chars[1] ?? chars[0] ?? 'S' };
 }
 
 /* ---------------------------------------------------------------------------

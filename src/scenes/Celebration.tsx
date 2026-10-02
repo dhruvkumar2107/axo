@@ -13,7 +13,7 @@ import {
   LotusDivider,
   TempleHorizon,
 } from '@/components/art/Manapam';
-import { config } from '@/lib/site';
+import { config, site } from '@/lib/site';
 import { scroll } from '@/lib/scroll';
 import type { WeddingEvent } from '@/config/wedding.config';
 
@@ -22,8 +22,7 @@ import type { WeddingEvent } from '@/config/wedding.config';
  *  SCENE 05 — THE CELEBRATION
  * ============================================================================
  *
- *  Only one function is confirmed: the wedding, on 17 October, in Kanakapura.
- *  Everything else is deliberately absent rather than invented.
+ *  All three confirmed functions are shown in chronological order.
  *
  *  Two presentations of the same data:
  *
@@ -56,7 +55,7 @@ export function Celebration() {
 
       <div className="relative mx-auto flex w-full max-w-5xl flex-col items-center gap-[clamp(3rem,8vh,5.5rem)]">
         <SceneHeading label="The Celebration" tone="ivory" className="mx-auto">
-          <span id="celebration-heading">One confirmed day</span>
+          <span id="celebration-heading">Three moments, one celebration</span>
         </SceneHeading>
 
         <div className="grid w-full grid-cols-1 gap-6 md:grid-cols-2 md:gap-7">
@@ -65,25 +64,13 @@ export function Celebration() {
           ))}
         </div>
 
-        {/* The ceremonial spine. With a single confirmed function there is
-            nothing to place on it, so it is not drawn at all. */}
+        {/* The ceremonial spine follows the functions in order. */}
         {config.events.length > 1 ? <CeremonySpine events={config.events} /> : null}
-
-        {/*
-          A quiet, dignified note about the remaining functions. This is the
-          only place the site admits to awaiting information, and it does so
-          once, plainly.
-        */}
-        {config.events.length === 1 ? (
-          <p className="measure max-w-[44ch] text-center font-display text-[clamp(0.85rem,3.2vw,1rem)] italic leading-relaxed fg-paper-muted">
-            Further functions will be added here as each is confirmed.
-          </p>
-        ) : null}
 
         <LampPair className="w-full max-w-[16rem] opacity-70" />
 
         <p className="label fg-paper-muted">
-          {config.location.city} &middot; {config.location.state} &middot; {config.date.month} {config.date.day}
+          {config.location.venue} &middot; {config.location.city} &middot; {config.date.month} {config.date.day}, {config.date.year}
         </p>
       </div>
     </section>
@@ -148,13 +135,14 @@ function EventCard({ event }: { event: WeddingEvent }) {
         </div>
 
         <dl className="flex flex-col gap-4">
-          <Detail label="When" value={event.dateLabel} fallback={`17 ${config.date.month}`} />
+          <Detail label="When" value={event.dateLabel} fallback={site.dateLabel} />
           <Detail label="Time" value={event.timeLabel} fallback="To be announced" />
           <Detail
-            label="Where"
-            value={event.venue ?? event.address}
+            label="Venue"
+            value={event.venue}
             fallback={config.location.label}
           />
+          <Detail label="Address" value={event.address} fallback={config.location.address} />
           <Detail label="Dress" value={event.dressCode} fallback="To be announced" />
         </dl>
 
@@ -253,7 +241,7 @@ function Detail({
     <div className="flex items-baseline justify-between gap-5">
       <dt className="label fg-paper-faint shrink-0">{label}</dt>
       <dd
-        className={`text-right font-display text-[clamp(0.95rem,3.4vw,1.1rem)] ${
+        className={`min-w-0 break-words text-right font-display text-[clamp(0.95rem,3.4vw,1.1rem)] ${
           present ? 'fg-paper' : 'italic fg-paper-muted'
         }`}
       >

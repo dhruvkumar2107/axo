@@ -205,7 +205,7 @@ export function MonogramScene({ onReady }: { onReady?: () => void }) {
     };
 
     const letters = buildExtrusion(
-      `${config.meta.monogram[0] ?? 'G'} ${config.meta.monogramGlyph} ${config.meta.monogram[1] ?? 'Y'}`,
+      `${config.meta.monogram[0] ?? 'Y'} ${config.meta.monogramGlyph} ${config.meta.monogram[1] ?? 'S'}`,
       profile.mobile ? 200 : 300,
       0.9,
     );

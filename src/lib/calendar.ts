@@ -8,9 +8,8 @@
  *   · Apple / Outlook — a real RFC 5545 .ics file, downloaded
  *   · Any other calendar — the same .ics file
  *
- * The year is resolved once by `resolveWeddingMoment`, so if the family has not
- * yet confirmed it, the countdown still targets the next 17 October without the
- * file ever asserting a year in its printed title.
+ * The year is resolved once by `resolveWeddingMoment`, so calendar entries,
+ * countdowns and printed dates all stay in agreement.
  */
 
 import { addDays, toICSDate, toLocalISO } from '@/lib/date';
@@ -45,7 +44,7 @@ function foldLine(line: string): string {
 export interface CalendarEventInput {
   uid: string;
   title: string;
-  /** Printed date, e.g. "17 October". */
+  /** Printed date, e.g. "26 November 2026". */
   dateLabel: string;
   /** Printed location. */
   location: string;
@@ -137,8 +136,8 @@ export function toCalendarEvent(event: WeddingEvent, origin: string): CalendarEv
   const startsAt = event.startsAt ? new Date(event.startsAt) : site.dateMoment?.date ?? new Date();
   const endsAt = event.endsAt ? new Date(event.endsAt) : null;
 
-  const title = `${config.meta.groom} & ${config.meta.bride} — ${event.name}`;
-  const location = [event.venue, event.address, config.location.label]
+  const title = `${site.names} — ${event.name}`;
+  const location = [event.venue, event.address, config.location.city, config.location.state]
     .filter((part): part is string => Boolean(part))
     .join(', ');
 

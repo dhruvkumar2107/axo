@@ -69,7 +69,7 @@ export function Final() {
           immediate
           className="max-w-[18ch] font-display text-fluid-2xl font-light italic leading-[1.15] fg-silk text-balance"
         >
-          Until we meet on the seventeenth of October
+          Until we meet on {site.dateLong ?? site.dateLabel}
         </RevealText>
 
         <div className="flex flex-col items-center gap-3">
@@ -79,7 +79,7 @@ export function Final() {
             delay={0.2}
             className="foil font-display text-fluid-xl font-light uppercase tracking-[0.18em]"
           >
-            {site.namesStacked.groom}
+            {site.namesStacked.bride}
           </RevealText>
           <RevealText
             as="p"
@@ -87,7 +87,7 @@ export function Final() {
             delay={0.32}
             className="foil font-display text-fluid-xl font-light uppercase tracking-[0.18em]"
           >
-            {site.namesStacked.bride}
+            {site.namesStacked.groom}
           </RevealText>
         </div>
 

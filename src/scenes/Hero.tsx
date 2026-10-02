@@ -243,8 +243,9 @@ export function Hero() {
             stagger={0.055}
             className="foil-ink font-display text-fluid-4xl font-light uppercase leading-[0.9] tracking-[0.02em] text-balance"
           >
-            {site.namesStacked.groom}
+            {site.namesStacked.bride}
           </RevealText>
+          <p className="label mt-2 fg-paper-muted">{config.meta.brideCredentials}</p>
 
           <div className="my-[clamp(0.5rem,1.6vh,1.1rem)] flex items-center gap-4" aria-hidden="true">
             <span className="h-px w-[clamp(2rem,10vw,5rem)] bg-gradient-to-r from-transparent to-gold-antique/50" />
@@ -261,8 +262,9 @@ export function Hero() {
             stagger={0.055}
             className="foil-ink font-display text-fluid-4xl font-light uppercase leading-[0.9] tracking-[0.02em] text-balance"
           >
-            {site.namesStacked.bride}
+            {site.namesStacked.groom}
           </RevealText>
+          <p className="label mt-2 fg-paper-muted">{config.meta.groomCredentials}</p>
         </div>
 
         {/* The date, set in the maroon of the silk border. */}
