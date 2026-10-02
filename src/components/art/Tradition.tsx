@@ -33,10 +33,22 @@ import { cn } from '@/lib/cn';
    Shared helpers
    --------------------------------------------------------------------------- */
 
+/**
+ * Quantise to three decimals before a number reaches an SVG attribute.
+ *
+ * `Math.sin` is not bit-identical between the server and the browser, so an
+ * unrounded coordinate can differ around the 16th decimal - enough for React
+ * to report a hydration mismatch and throw the server markup away. Three
+ * decimals is far finer than a 200-unit viewBox can show.
+ */
+function q(value: number): number {
+  return Math.round(value * 1000) / 1000;
+}
+
 /** Deterministic pseudo-random in [0,1) from a seed, so SSR and client agree. */
 function rand(seed: number, salt: number): number {
   const x = Math.sin(seed * 12.9898 + salt * 78.233) * 43758.5453;
-  return x - Math.floor(x);
+  return q(x - Math.floor(x));
 }
 
 interface MotifProps {
@@ -372,8 +384,8 @@ export function JasmineString({
   const pts: Array<{ x: number; y: number }> = [];
   for (let i = 0; i < count; i += 1) {
     const t = i / (count - 1);
-    const x = 12 + t * (width - 24);
-    const y = 26 + Math.sin(t * Math.PI) * (30 + rand(seed, i) * 8);
+    const x = q(12 + t * (width - 24));
+    const y = q(26 + Math.sin(t * Math.PI) * (30 + rand(seed, i) * 8));
     pts.push({ x, y });
   }
   const strand = pts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');

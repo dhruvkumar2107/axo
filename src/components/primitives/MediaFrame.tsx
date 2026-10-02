@@ -37,6 +37,12 @@ export interface MediaFrameProps {
   caption?: ReactNode;
   /** Extra classes on the caption, so the gallery can style its numbered label. */
   captionClassName?: string;
+  /**
+   * Classes for the `<figure>` wrapper itself, when a caller needs to size or
+   * space the frame-and-caption pair as one block. `className` still lands on
+   * the picture box, which is what every existing caller expects.
+   */
+  figureClassName?: string;
 }
 
 export function MediaFrame({
@@ -52,45 +58,55 @@ export function MediaFrame({
   align = 'center',
   caption,
   captionClassName,
+  figureClassName,
 }: MediaFrameProps) {
   const objectPosition = align === 'top' ? 'center top' : align === 'bottom' ? 'center bottom' : 'center';
 
   return (
-    <figure
-      className={cn('relative isolate overflow-hidden bg-emerald-deep', className)}
-      style={{ aspectRatio: ratio }}
-      data-media={src ? 'photo' : 'art'}
-    >
-      {src ? (
-        <Image
-          src={src}
-          alt={alt}
-          fill
-          priority={priority}
-          sizes={sizes}
-          loading={priority ? undefined : 'lazy'}
-          quality={82}
-          className={cn(
-            'object-cover transition-transform duration-[1600ms] ease-silk will-change-transform',
-            imageClassName,
-          )}
-          style={{ objectPosition }}
-        />
-      ) : (
-        <ProceduralArt art={art} tone={tone} />
-      )}
+    /*
+      The `<figure>` is a plain wrapper. The picture box is a child of it, not
+      the figure itself, because the box carries a fixed aspect ratio and clips
+      its overflow - a `<figcaption>` placed inside that box is squeezed into
+      the crop and clipped. Here the caption is a sibling of the box and a
+      direct child of the figure, which is where the HTML spec allows it.
+    */
+    <figure className={cn('relative', figureClassName)}>
+      <div
+        className={cn('relative isolate overflow-hidden bg-emerald-deep', className)}
+        style={{ aspectRatio: ratio }}
+        data-media={src ? 'photo' : 'art'}
+      >
+        {src ? (
+          <Image
+            src={src}
+            alt={alt}
+            fill
+            priority={priority}
+            sizes={sizes}
+            loading={priority ? undefined : 'lazy'}
+            quality={82}
+            className={cn(
+              'object-cover transition-transform duration-[1600ms] ease-silk will-change-transform',
+              imageClassName,
+            )}
+            style={{ objectPosition }}
+          />
+        ) : (
+          <ProceduralArt art={art} tone={tone} />
+        )}
 
-      {/* A hairline inner edge: the frame is part of the object, not the page. */}
-      <span
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-gold/15"
-      />
-      {/* Bottom lift, so type set over an image always has contrast. */}
-      <span
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-ink/55 to-transparent"
-      />
-      {caption ? <figcaption className={cn('relative', captionClassName)}>{caption}</figcaption> : null}
+        {/* A hairline inner edge: the frame is part of the object, not the page. */}
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-gold/15"
+        />
+        {/* Bottom lift, so type set over an image always has contrast. */}
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-ink/55 to-transparent"
+        />
+      </div>
+      {caption ? <figcaption className={captionClassName}>{caption}</figcaption> : null}
     </figure>
   );
 }
