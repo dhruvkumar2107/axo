@@ -11,8 +11,9 @@ import {
   TempleHorizon,
 } from '@/components/art/Manapam';
 import { RevealText } from '@/components/motion/Reveal';
+import { EnterWedding } from '@/components/hud/EnterWedding';
 import { config, site } from '@/lib/site';
-import { scroll } from '@/lib/scroll';
+import { scroll, scrollTo } from '@/lib/scroll';
 
 /**
  * ============================================================================
@@ -41,6 +42,77 @@ export function Hero() {
   const foreRef = useRef<HTMLDivElement>(null);
   const cueRef = useRef<HTMLDivElement>(null);
   const typeRef = useRef<HTMLDivElement>(null);
+
+  /**
+   * The opening screen used to be a wall: the names, the date and a 12px
+   * hairline that most guests never noticed. One deliberate gesture should be
+   * enough to move on, whether it arrives as a click, a wheel notch or an
+   * upward swipe.
+   *
+   * This is a *hint*, not a scroll trap, so it is deliberately bounded:
+   *
+   *   · it only arms while the opening is genuinely the page's current view
+   *     (`scrollY <= 4`), so it can never fight scrolling anywhere else
+   *   · it only reacts to downward or upward intent, so scrollback is untouched
+   *   · it disarms and detaches after the first gesture that carries the guest
+   *     onward, or as soon as they scroll away by any other means
+   *
+   * Everything after that is ordinary scrolling, which is the point.
+   */
+  useEffect(() => {
+    let touchY: number | null = null;
+    let touchScrollY: number | null = null;
+
+    function advance() {
+      detach();
+      // -56 keeps the next scene's heading clear of the fixed header.
+      scrollTo('#invitation', -56);
+    }
+
+    // Non-passive: the native scroll has to be suppressed, or the wheel notch
+    // and the animation fight each other and the guest lands in the wrong
+    // place.
+    function onWheel(event: WheelEvent) {
+      if (window.scrollY > 4) {
+        detach();
+        return;
+      }
+      if (event.deltaY <= 0) return;
+      event.preventDefault();
+      advance();
+    }
+
+    function onTouchStart(event: TouchEvent) {
+      touchY = event.touches[0]?.clientY ?? null;
+      // Recorded here, not at touchend: by the time the finger lifts, the
+      // browser has already carried the native scroll past the top, and the
+      // gesture would never look like it began on the opening screen.
+      touchScrollY = window.scrollY;
+    }
+
+    function onTouchEnd(event: TouchEvent) {
+      const start = touchY;
+      const end = event.changedTouches[0]?.clientY;
+      const from = touchScrollY;
+      touchY = null;
+      touchScrollY = null;
+      if (start == null || end == null || from == null) return;
+      // Upward swipe, far enough to read as intent rather than rubber-banding.
+      if (start - end > 48 && from <= 4) advance();
+    }
+
+    function detach() {
+      window.removeEventListener('wheel', onWheel);
+      window.removeEventListener('touchstart', onTouchStart);
+      window.removeEventListener('touchend', onTouchEnd);
+    }
+
+    window.addEventListener('wheel', onWheel, { passive: false });
+    window.addEventListener('touchstart', onTouchStart, { passive: true });
+    window.addEventListener('touchend', onTouchEnd, { passive: true });
+
+    return detach;
+  }, []);
 
   useEffect(() => {
     const root = rootRef.current;
@@ -123,7 +195,7 @@ export function Hero() {
       ref={rootRef}
       id="hero"
       data-scene="hero"
-      className="scene scene-paper paper paper-grain relative isolate flex flex-col items-center justify-center overflow-hidden px-[var(--gutter)] pb-[clamp(5rem,12vh,9rem)] pt-[clamp(6rem,16vh,10rem)] text-center"
+      className="scene scene-paper paper paper-grain relative isolate flex h-[100svh] flex-col items-center justify-center overflow-hidden px-[var(--gutter)] pb-[clamp(8.5rem,17svh,11rem)] pt-[clamp(3rem,8svh,7rem)] text-center supports-[height:100dvh]:h-[100dvh]"
       aria-labelledby="hero-names"
     >
       {/* --- Far plane: the estate, and the couple within it -------------- */}
@@ -199,7 +271,7 @@ export function Hero() {
           immediate
           delay={1.15}
           stagger={0.1}
-          className="mt-[clamp(2.5rem,7vh,4.5rem)] font-display text-fluid-xl font-normal tracking-[0.42em] text-maroon"
+          className="mt-[clamp(1.5rem,5svh,4rem)] font-display text-fluid-xl font-normal tracking-[0.42em] text-maroon"
         >
           {site.dateLabel.toUpperCase()}
         </RevealText>
@@ -220,22 +292,22 @@ export function Hero() {
           immediate
           delay={1.6}
           stagger={0.06}
-          className="mt-[clamp(2rem,6vh,3.5rem)] max-w-[26ch] font-display text-fluid-md italic leading-relaxed fg-paper-muted text-balance"
+          className="mt-[clamp(1rem,4svh,3rem)] max-w-[26ch] font-display text-fluid-md italic leading-relaxed fg-paper-muted text-balance"
         >
           {config.invitation.blessingsLine}
         </RevealText>
       </div>
 
-      {/* --- Scroll cue --------------------------------------------------- */}
+      {/* --- The way on ---------------------------------------------------
+          Absolutely placed so it sits below the names without pushing them up
+          the screen, and given a generous inset from the bottom edge: on a
+          short phone this is the one thing a guest must be able to see and
+          reach without scrolling first. */}
       <div
         ref={cueRef}
-        className="pointer-events-none absolute inset-x-0 bottom-0 flex flex-col items-center gap-3 pb-[max(1.75rem,env(safe-area-inset-bottom))]"
-        aria-hidden="true"
+        className="absolute inset-x-0 bottom-0 flex justify-center px-[var(--gutter)] pb-[max(1.5rem,env(safe-area-inset-bottom))]"
       >
-        <span className="label text-[0.5rem] fg-paper-faint">Scroll</span>
-        <span className="relative block h-12 w-px overflow-hidden bg-gold-antique/20">
-          <span className="cue-line absolute inset-x-0 top-0 h-4 bg-gradient-to-b from-transparent via-gold-antique/70 to-transparent" />
-        </span>
+        <EnterWedding className="pointer-events-auto" />
       </div>
     </section>
   );

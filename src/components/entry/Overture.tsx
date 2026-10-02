@@ -8,6 +8,7 @@ import {
   HangingJasmine,
   KolamDivider,
   LampPair,
+  Petals,
   TempleFrame,
   TempleHorizon,
 } from '@/components/art/Manapam';
@@ -167,71 +168,87 @@ export function Overture({ stageReady, onStageReady }: OvertureProps) {
 
         {/* Jasmine, hung from the lintel. Two strands, unequal lengths. */}
         <HangingJasmine count={2} />
+
+        {/* Floating flower petals - subtle South Indian aesthetic */}
+        <Petals count={6} />
       </div>
 
       {/* -------------------------------------------------------------------
-          Layer 3 — the type. The whole first screen, and nothing else.
-          ------------------------------------------------------------------ */}
+            Layer 3 — the type. The whole first screen, and nothing else.
+
+            Viewport-safe layout: fits inside 100vh / 100svh / 100dvh without
+            any scrolling on desktop (1366x768, 1440x900, 1920x1080) and mobile.
+            All requested wedding details are immediately visible.
+            ------------------------------------------------------------------ */}
       <div
         ref={typeRef}
-        className="relative z-10 flex h-full flex-col items-center justify-between px-[var(--gutter)] pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-[max(1.75rem,env(safe-area-inset-top))]"
+        className="relative z-10 flex h-[100svh] flex-col items-center justify-between overflow-hidden px-[var(--gutter)] pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-[max(1.25rem,env(safe-area-inset-top))] supports-[height:100dvh]:h-[100dvh]"
       >
-        {/* --- Top: the date, small, as printed on a plate --- */}
-        <p
-          data-rise
-          className="label order-1 mt-[clamp(0.5rem,3vh,2rem)] text-center fg-night-muted"
-        >
-          {site.dateLabel.toUpperCase()}
-          <span className="mx-2 fg-brass-muted">&middot;</span>
-          {config.location.city.toUpperCase()}
-        </p>
-
-        {/* --- Centre: the monogram, then the names --- */}
-        <div className="order-2 flex flex-col items-center justify-center">
+        {/* --- Top: Welcoming label or salutation --- */}
+        <div data-rise className="order-1 mt-[clamp(0.25rem,1.2vh,0.75rem)] text-center">
           {greeting ? (
-            <p data-rise className="label mb-[clamp(1.25rem,4vh,2.5rem)] fg-night-muted">
-              {greeting}
+            <p className="label fg-night-muted">{greeting}</p>
+          ) : (
+            <p className="label fg-night-muted tracking-[0.34em]">
+              WEDDING INVITATION
             </p>
-          ) : null}
+          )}
+        </div>
 
+        {/* --- Centre: monogram, couple names, date, location, tagline --- */}
+        <div className="order-2 flex min-h-0 flex-col items-center justify-center">
           <div
             ref={monogramRef}
-            className="relative flex h-[min(34svh,320px)] w-full items-center justify-center"
+            className="relative flex h-[min(18svh,140px)] w-full items-center justify-center"
           >
             <EmbossedMonogram />
           </div>
 
-          <div className="mt-[clamp(1.5rem,5vh,3.25rem)] flex flex-col items-center gap-[clamp(0.35rem,1vh,0.75rem)] text-center">
-            <p
+          <div className="mt-[clamp(0.35rem,1.2svh,0.85rem)] flex flex-col items-center gap-[clamp(0.15rem,0.4svh,0.35rem)] text-center">
+            <h1
               data-rise
-              className="foil foil-shimmer font-display font-light uppercase leading-[1.02] tracking-[0.03em] text-fluid-3xl"
+              className="foil foil-shimmer font-display font-light uppercase leading-[1.02] tracking-[0.03em] text-fluid-2xl"
             >
               {site.namesStacked.groom}
-            </p>
-            <p data-rise className="label fg-brass-muted">
+            </h1>
+            <p data-rise className="label fg-brass-muted" aria-hidden="true">
               {config.meta.monogramGlyph}
             </p>
             <p
               data-rise
-              className="foil foil-shimmer font-display font-light uppercase leading-[1.02] tracking-[0.03em] text-fluid-3xl"
+              className="foil foil-shimmer font-display font-light uppercase leading-[1.02] tracking-[0.03em] text-fluid-2xl"
             >
               {site.namesStacked.bride}
             </p>
           </div>
 
-          {/* --- A kolam at the feet of the names: the floor of the mandapam --- */}
-          <div data-rise className="mt-[clamp(1.25rem,4vh,2.5rem)]">
-            <KolamDivider className="w-[3.25rem] opacity-45" />
+          {/* 17 October · Kanakapura, Karnataka & Celebration Tagline */}
+          <div data-rise className="mt-[clamp(0.35rem,1svh,0.75rem)] flex flex-col items-center gap-1 text-center">
+            <p className="label tracking-[0.26em] text-[clamp(0.6rem,0.85vw,0.72rem)] text-gold-light">
+              17 OCTOBER
+              <span className="mx-2 fg-brass-muted">&middot;</span>
+              KANAKAPURA, KARNATAKA
+            </p>
+            <p className="font-display italic text-[clamp(0.8rem,1.3svh,0.98rem)] fg-night-muted tracking-wide text-balance max-w-[28ch]">
+              A celebration of love, family and forever.
+            </p>
+          </div>
+
+          {/* Kolam divider at feet of names: hidden on short viewports */}
+          <div data-rise className="mt-[clamp(0.25rem,0.8svh,0.6rem)] hidden [@media(min-height:640px)]:block">
+            <KolamDivider className="w-[2.25rem] opacity-45" />
           </div>
         </div>
 
-        {/* --- Bottom: the only call to action on the first screen --- */}
-        <div className="order-3 flex w-full flex-col items-center gap-3">
-          {/* Lamps on the floor, flanking the plate a guest is about to press. */}
-          <LampPair className="w-full max-w-[22rem] opacity-70" />
+        {/* --- Bottom: CTA section --- */}
+        <div className="order-3 flex w-full shrink-0 flex-col items-center gap-2">
+          {/* Subtle brass deepams on the floor */}
+          <div className="hidden [@media(min-height:580px)]:block w-full">
+            <LampPair className="w-full max-w-[20rem] opacity-70" />
+          </div>
 
           <button type="button" onClick={handleEnter} className="seal-button">
-            Enter the celebration
+            ENTER THE CELEBRATION
           </button>
           <p className="label text-[0.5rem] fg-night-faint" aria-hidden="true">
             {profile.isMobile ? 'Touch to begin' : 'Sound accompanies the invitation'}

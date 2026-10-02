@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
 
 import { AudioPlayer } from '@/components/hud/AudioPlayer';
 import { BackToTop } from '@/components/hud/BackToTop';
@@ -9,22 +10,28 @@ import { SiteNav } from '@/components/hud/SiteNav';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { Overture } from '@/components/entry/Overture';
 import { PalaceDoors } from '@/components/entry/PalaceDoors';
-import { Blessings } from '@/scenes/Blessings';
-import { Celebration } from '@/scenes/Celebration';
-import { Countdown } from '@/scenes/Countdown';
-import { Destination } from '@/scenes/Destination';
-import { Details } from '@/scenes/Details';
-import { Final } from '@/scenes/Final';
-import { Footer } from '@/scenes/Footer';
-import { Gallery } from '@/scenes/Gallery';
 import { Hero } from '@/scenes/Hero';
 import { Invitation } from '@/scenes/Invitation';
-import { Rsvp } from '@/scenes/Rsvp';
-import { SaveTheDate } from '@/scenes/SaveTheDate';
-import { Story } from '@/scenes/Story';
 import { useExperience } from '@/lib/experience';
 import { afterFirstPaint } from '@/lib/frame';
 import { lockScroll, scroll, unlockScroll } from '@/lib/scroll';
+
+/**
+ * The invitation below the fold, deferred.
+ *
+ * `ssr: false` is deliberate. These scenes are gated behind an opening screen
+ * and a press, so they cannot be read on arrival and there is nothing to gain
+ * by server-rendering markup that is `visibility: hidden` until the guest is
+ * inside. Crawlers and visitors without JavaScript are served the real content
+ * by `NoScript`, which is server-rendered and always in the document.
+ *
+ * The fallback reserves nothing on purpose: while this is loading the parent is
+ * still invisible and scroll is still locked, so a spacer would only add a box
+ * to remove a moment later.
+ */
+const InvitationRest = dynamic(() => import('@/components/InvitationRest').then((m) => m.InvitationRest), {
+  ssr: false,
+});
 
 /**
  * ============================================================================
@@ -56,6 +63,14 @@ export function InvitationApp() {
    * window in between where the work is genuinely free.
    */
   const [quiet, setQuiet] = useState(false);
+
+  /**
+   * The same window, but for the invitation below the fold — and deliberately
+   * *not* gated on WebGL. Gating this on the 3D would mean a guest on a device
+   * that opted out of WebGL never received the rest of the invitation at all,
+   * which is a content bug hiding inside a performance optimisation.
+   */
+  const [contentReady, setContentReady] = useState(false);
 
   /**
    * Content is mounted one act early, on purpose: warming it while the guest
@@ -91,6 +106,15 @@ export function InvitationApp() {
     // `afterFirstPaint` returns its own cancel, so the flag is redundant.
     return afterFirstPaint(() => setQuiet(true));
   }, [useWebGL]);
+
+  /*
+   * Fetch the invitation below the fold in the same idle window.
+   *
+   * Ungated on purpose, and independent of the palace above: this is content,
+   * not an effect. It has to be resident before the doors finish, because the
+   * guest can scroll the moment they do.
+   */
+  useEffect(() => afterFirstPaint(() => setContentReady(true)), []);
 
   return (
     <>
@@ -139,39 +163,16 @@ export function InvitationApp() {
             <Scene name="invitation">
               <Invitation />
             </Scene>
-            <Scene name="story">
-              <Story />
-            </Scene>
-            <Scene name="save-the-date">
-              <SaveTheDate />
-            </Scene>
-            <Scene name="celebration">
-              <Celebration />
-            </Scene>
-            <Scene name="countdown">
-              <Countdown />
-            </Scene>
-            <Scene name="destination">
-              <Destination />
-            </Scene>
-            <Scene name="gallery">
-              <Gallery />
-            </Scene>
-            <Scene name="details">
-              <Details />
-            </Scene>
-            <Scene name="blessings">
-              <Blessings />
-            </Scene>
-            <Scene name="rsvp">
-              <Rsvp />
-            </Scene>
-            <Scene name="final">
-              <Final />
-            </Scene>
-          </main>
 
-          <Footer />
+            {/*
+              Everything below the invitation, as one deferred chunk. `quiet` is
+              the moment the opening has painted and the browser has gone idle:
+              the guest is reading, the entry sequence still has its doors to
+              open, and this half of the page is not reachable yet. See
+              `InvitationRest` for why this is a separate module.
+            */}
+            {contentReady ? <InvitationRest /> : null}
+          </main>
         </div>
       ) : null}
     </>

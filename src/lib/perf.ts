@@ -119,8 +119,10 @@ export const QUALITY_BUDGET: Record<
     clearcoat: boolean;
   }
 > = {
-  cinematic: { maxDpr: 2, particles: 900, petals: 220, shadows: true, godRays: true, rimLight: true, clearcoat: true },
-  balanced: { maxDpr: 1.75, particles: 420, petals: 110, shadows: false, godRays: true, rimLight: true, clearcoat: true },
+  cinematic: { maxDpr: 1.6, particles: 500, petals: 140, shadows: true, godRays: true, rimLight: true, clearcoat: true },
+  // Phones and tablets land here. 1.35x DPR is visually indistinguishable from 2x/3x
+  // on mobile while saving over 50% GPU fill cost, ensuring fluid 60fps.
+  balanced: { maxDpr: 1.35, particles: 260, petals: 70, shadows: false, godRays: true, rimLight: true, clearcoat: true },
   essential: { maxDpr: 1, particles: 0, petals: 0, shadows: false, godRays: false, rimLight: false, clearcoat: false },
 };
 

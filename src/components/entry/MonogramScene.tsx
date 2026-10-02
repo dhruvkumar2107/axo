@@ -81,7 +81,9 @@ export function MonogramScene({ onReady }: { onReady?: () => void }) {
       return;
     }
 
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, budget.maxDpr));
+    // Adaptive DPR strategy: 1 - 1.5 for optimal performance & sharpness
+    const maxDpr = profile.mobile ? 1.4 : Math.min(1.6, budget.maxDpr);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, maxDpr));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.16;
@@ -245,6 +247,46 @@ export function MonogramScene({ onReady }: { onReady?: () => void }) {
     scene.add(bounce);
 
     /* =====================================================================
+       Atmosphere — subtle golden particles floating in warm light
+       ===================================================================== */
+    const particleCount = profile.mobile ? 28 : 56;
+    const pPositions = new Float32Array(particleCount * 3);
+    const pVelocities = new Float32Array(particleCount);
+    for (let i = 0; i < particleCount; i++) {
+      pPositions[i * 3] = (Math.random() - 0.5) * 7.5;
+      pPositions[i * 3 + 1] = (Math.random() - 0.5) * 5.5;
+      pPositions[i * 3 + 2] = (Math.random() - 0.5) * 3.5;
+      pVelocities[i] = 0.06 + Math.random() * 0.08;
+    }
+    const pGeo = new THREE.BufferGeometry();
+    pGeo.setAttribute('position', new THREE.BufferAttribute(pPositions, 3));
+
+    const moteCanvas = document.createElement('canvas');
+    moteCanvas.width = moteCanvas.height = 32;
+    const mctx = moteCanvas.getContext('2d');
+    if (mctx) {
+      const grad = mctx.createRadialGradient(16, 16, 0, 16, 16, 16);
+      grad.addColorStop(0, 'rgba(255, 238, 180, 0.95)');
+      grad.addColorStop(0.35, 'rgba(218, 168, 60, 0.55)');
+      grad.addColorStop(0.7, 'rgba(180, 120, 30, 0.15)');
+      grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      mctx.fillStyle = grad;
+      mctx.fillRect(0, 0, 32, 32);
+    }
+    const moteTex = new THREE.CanvasTexture(moteCanvas);
+    const pMat = new THREE.PointsMaterial({
+      size: profile.mobile ? 0.09 : 0.12,
+      map: moteTex,
+      transparent: true,
+      opacity: 0.6,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    });
+    const particles = new THREE.Points(pGeo, pMat);
+    scene.add(particles);
+    disposables.push(pGeo, pMat, moteTex);
+
+    /* =====================================================================
        Environment — a tiny procedural studio map.
 
        Metal is almost entirely reflection, so without an environment the gold
@@ -339,6 +381,23 @@ export function MonogramScene({ onReady }: { onReady?: () => void }) {
         camera.position.x += (pointer.x * 0.26 - camera.position.x) * Math.min(1, dt * 2);
         camera.position.y += (-pointer.y * 0.16 - camera.position.y) * Math.min(1, dt * 2);
         camera.lookAt(0, 0, 0);
+
+        // Slow cinematic drift of golden particles
+        const posAttr = pGeo.attributes.position as THREE.BufferAttribute;
+        const arr = posAttr.array as Float32Array;
+        for (let i = 0; i < particleCount; i++) {
+          const idx = i * 3 + 1;
+          const vy = pVelocities[i] ?? 0.08;
+          const currY = arr[idx] ?? 0;
+          const nextY = currY + vy * dt;
+          if (nextY > 2.8) {
+            arr[idx] = -2.8;
+            arr[i * 3] = (Math.random() - 0.5) * 7.5;
+          } else {
+            arr[idx] = nextY;
+          }
+        }
+        posAttr.needsUpdate = true;
       }
 
       renderer.render(scene, camera);

@@ -734,31 +734,42 @@
     align-items: center;
     justify-content: center;
     gap: 0.9em;
-    padding: 1.05em 2.4em;
+    padding: 0.95em 2.4em;
+    /*
+     * A floor on the tap target, not a suggestion. At the label size below,
+     * padding alone produced a 33px button on a phone — under the 44px
+     * minimum — because the type is set small enough to stay elegant. This
+     * guarantees the height on every screen without touching the type.
+     */
+    min-height: 2.75rem;
     border-radius: 999px;
     font-family: var(--font-manrope), system-ui, sans-serif;
-    font-size: clamp(0.5625rem, 0.52rem + 0.18vw, 0.6875rem);
+    font-size: clamp(0.625rem, 0.58rem + 0.18vw, 0.72rem);
     font-weight: 500;
-    letter-spacing: 0.3em;
+    letter-spacing: 0.28em;
     text-transform: uppercase;
     white-space: nowrap;
     isolation: isolate;
-    color: rgb(var(--gold-light));
+    color: rgb(var(--gold-pale));
+    background-color: rgba(20, 32, 28, 0.65);
     background-image: linear-gradient(
       160deg,
-      rgb(var(--gold) / 0.14),
-      rgb(var(--gold) / 0.04) 45%,
-      rgb(var(--gold) / 0.12)
+      rgb(var(--gold) / 0.18),
+      rgb(var(--gold) / 0.06) 45%,
+      rgb(var(--gold) / 0.16)
     );
+    border: 1px solid rgb(var(--gold-antique) / 0.55);
     box-shadow:
-      inset 0 0 0 1px rgb(var(--gold) / 0.42),
-      inset 0 1px 0 rgb(var(--gold-light) / 0.22),
-      0 18px 50px -24px rgb(var(--gold) / 0.5);
+      inset 0 0 0 1px rgb(var(--gold-light) / 0.22),
+      inset 0 1px 0 rgb(var(--gold-light) / 0.3),
+      0 12px 35px -15px rgb(var(--gold-shadow) / 0.6);
     transition:
-      color 0.6s var(--ease-silk),
-      box-shadow 0.7s var(--ease-silk),
-      transform 0.7s var(--ease-silk);
-    will-change: transform;
+      color 0.5s var(--ease-silk),
+      border-color 0.5s var(--ease-silk),
+      background-color 0.5s var(--ease-silk),
+      box-shadow 0.6s var(--ease-silk),
+      transform 0.5s var(--ease-silk);
+    will-change: transform, box-shadow;
   }
   .seal-button::after {
     content: '';
@@ -769,19 +780,23 @@
     opacity: 0;
     background: linear-gradient(
       100deg,
-      transparent 20%,
-      rgb(var(--gold-light) / 0.28) 50%,
-      transparent 80%
+      transparent 15%,
+      rgb(var(--gold-light) / 0.25) 50%,
+      transparent 85%
     );
-    transition: opacity 0.7s var(--ease-silk);
+    transition: opacity 0.6s var(--ease-silk);
   }
   .seal-button:hover,
   .seal-button:focus-visible {
-    color: rgb(var(--gold-pale));
+    color: rgb(255 248 230);
+    border-color: rgb(var(--gold-light) / 0.85);
+    background-color: rgba(30, 48, 42, 0.8);
+    transform: scale(1.025);
     box-shadow:
-      inset 0 0 0 1px rgb(var(--gold-light) / 0.6),
-      inset 0 1px 0 rgb(var(--gold-light) / 0.34),
-      0 22px 60px -22px rgb(var(--gold) / 0.66);
+      inset 0 0 0 1px rgb(var(--gold-light) / 0.45),
+      inset 0 1px 0 rgb(255 246 214 / 0.5),
+      0 0 25px -4px rgb(var(--gold) / 0.4),
+      0 16px 45px -15px rgb(var(--gold) / 0.7);
   }
   .seal-button:hover::after,
   .seal-button:focus-visible::after {
@@ -1026,6 +1041,44 @@
 
   .cue-line {
     animation: cue-travel 2.8s var(--ease-silk) infinite;
+  }
+
+  /* --- ENTER THE WEDDING -------------------------------------------------
+     The arrow on the opening plaque breathes downward, as if weight were
+     pulling it. Small travel on a long cycle, so it reads as a gesture rather
+     than as a loop the eye waits for. The nudge is deliberately shorter than
+     the arrow itself, so the tip never appears to detach from its shaft.
+     -------------------------------------------------------------------- */
+  @keyframes enter-nudge {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0);
+    }
+    50% {
+      transform: translate3d(0, 0.4rem, 0);
+    }
+  }
+
+  @keyframes enter-sweep {
+    0% {
+      transform: translate3d(-140%, 0, 0) skewX(-14deg);
+      opacity: 0;
+    }
+    35% {
+      opacity: 0.55;
+    }
+    100% {
+      transform: translate3d(140%, 0, 0) skewX(-14deg);
+      opacity: 0;
+    }
+  }
+
+  .enter-arrow {
+    animation: enter-nudge 2.6s var(--ease-silk) infinite;
+  }
+
+  .enter-sweep {
+    animation: enter-sweep 3.8s var(--ease-silk) infinite;
   }
 }
 

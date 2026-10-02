@@ -124,7 +124,8 @@ export function PalaceScene({
       return;
     }
 
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, budget.maxDpr));
+    const maxDpr = tier === 'essential' ? 1 : tier === 'balanced' ? 1.35 : 1.6;
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, maxDpr));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     // Filmic tone mapping is what stops the warm interior from clipping to
     // white the moment the doors open.
@@ -256,6 +257,31 @@ export function PalaceScene({
     );
     frieze.position.set(0, DOOR_H + 1.32, -0.5);
     surround.add(frieze);
+
+    // Subtle brass temple bell suspended from the lintel (South Indian temple aesthetic)
+    const bellGroup = new THREE.Group();
+    const bellChain = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.008, 0.008, 0.36, 6),
+      brassDark,
+    );
+    bellChain.position.set(0, DOOR_H + 0.38, 0.2);
+    bellGroup.add(bellChain);
+
+    const bellBody = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.03, 0.1, 0.14, 14),
+      brass,
+    );
+    bellBody.position.set(0, DOOR_H + 0.2, 0.2);
+    bellGroup.add(bellBody);
+
+    const bellRim = new THREE.Mesh(
+      new THREE.TorusGeometry(0.1, 0.014, 8, 16),
+      brass,
+    );
+    bellRim.rotation.x = Math.PI / 2;
+    bellRim.position.set(0, DOOR_H + 0.13, 0.2);
+    bellGroup.add(bellRim);
+    surround.add(bellGroup);
 
     // Threshold slab, catching the light from within
     const threshold = new THREE.Mesh(
@@ -419,14 +445,35 @@ export function PalaceScene({
       [2.35, 1.15],
     ];
     for (const [x, z] of flamePositions) {
-      const bowl = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.06, 0.05, 12), brassDark);
-      bowl.position.set(x, 0.03, z);
-      scene.add(bowl);
+      const isPedestal = Math.abs(x) > 2.0;
+      if (isPedestal) {
+        // Traditional brass lamp (kuthuvilakku) pedestal
+        const base = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.12, 0.08, 14), brass);
+        base.position.set(x, 0.04, z);
+        scene.add(base);
 
-      const flame = new THREE.Mesh(new THREE.SphereGeometry(0.045, 8, 8), diyaMaterial);
-      flame.position.set(x, 0.1, z);
-      flame.scale.y = 1.8;
-      scene.add(flame);
+        const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.025, 0.2, 10), brass);
+        stem.position.set(x, 0.17, z);
+        scene.add(stem);
+
+        const bowl = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.06, 0.05, 14), brass);
+        bowl.position.set(x, 0.29, z);
+        scene.add(bowl);
+
+        const flame = new THREE.Mesh(new THREE.SphereGeometry(0.045, 8, 8), diyaMaterial);
+        flame.position.set(x, 0.36, z);
+        flame.scale.y = 1.9;
+        scene.add(flame);
+      } else {
+        const bowl = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.06, 0.05, 12), brassDark);
+        bowl.position.set(x, 0.03, z);
+        scene.add(bowl);
+
+        const flame = new THREE.Mesh(new THREE.SphereGeometry(0.045, 8, 8), diyaMaterial);
+        flame.position.set(x, 0.1, z);
+        flame.scale.y = 1.8;
+        scene.add(flame);
+      }
     }
 
     // Only two real point lights — the rest of the glow is emissive geometry,

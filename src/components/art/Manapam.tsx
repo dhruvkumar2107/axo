@@ -131,17 +131,29 @@ export function Petals({ count = PETALS.length }: { count?: number }) {
    =========================================================================== */
 
 export function LampPair({ className }: { className?: string }) {
+  // The width is set inline rather than by a utility class. `Motif` bases
+  // itself on `w-full`, and that utility wins the cascade over a width clamp
+  // passed as a class — so the lamps inherited half the row each and, with a
+  // 60/120 aspect ratio, rendered 350px tall. Two small lamps flanking the
+  // plate is the intent, so the size is pinned here where nothing can override
+  // it. See the opening-screen fit notes in `Overture`.
+  const lamp = { width: 'clamp(1.5rem,3.6vw,2.25rem)' } as const;
+
   return (
     <div
       className={cn('pointer-events-none flex items-end justify-between', className)}
       aria-hidden="true"
     >
-      <Motif name="deepam" className="w-[clamp(1.6rem,4vw,2.6rem)]">
-        <Deepam className="h-full w-full" />
-      </Motif>
-      <Motif name="deepam" className="w-[clamp(1.6rem,4vw,2.6rem)]">
-        <Deepam className="h-full w-full" />
-      </Motif>
+      <div style={lamp}>
+        <Motif name="deepam">
+          <Deepam className="h-full w-full" />
+        </Motif>
+      </div>
+      <div style={lamp}>
+        <Motif name="deepam">
+          <Deepam className="h-full w-full" />
+        </Motif>
+      </div>
     </div>
   );
 }
