@@ -303,18 +303,18 @@ export function PalaceDoors() {
       <div className="pointer-events-none absolute inset-0 z-20 flex flex-col items-center justify-center px-[var(--gutter)] text-center">
         <div ref={copyRef} className="flex flex-col items-center gap-5">
           {greeting ? (
-            <p className="label text-ivory/45">{greeting}</p>
+            <p className="label fg-night-muted">{greeting}</p>
           ) : (
-            <p className="label text-ivory/45">
+            <p className="label fg-night-muted">
               <span className="block">A celebration of love</span>
-              <span className="mt-1 block text-gold/70">A celebration of legacy</span>
+              <span className="mt-1 block fg-brass">A celebration of legacy</span>
             </p>
           )}
 
-          <Monogram size="hero" foil />
+          <Monogram size="hero" foil="gold" />
 
           <div className="mt-2 flex flex-col items-center gap-2">
-            <p className="label text-ivory/50">
+            <p className="label fg-night-muted">
               {site.dateLabel} &middot; {site.city}
             </p>
           </div>

@@ -148,7 +148,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`${cormorant.variable} ${manrope.variable}`}
       suppressHydrationWarning
     >
-      <body className="bg-ink text-ivory antialiased">
+      {/*
+        The document surface is warm ivory paper carrying warm ink. The night
+        scenes (overture, palace, closing) opt into `surface-night` themselves,
+        so they stay dark without the whole document having to be dark — which
+        also means the page a guest sees before hydration is a light page, not
+        a black rectangle.
+      */}
+      <body className="bg-ivory text-inkwarm antialiased">
         <NoScript />
         <Providers>{children}</Providers>
       </body>

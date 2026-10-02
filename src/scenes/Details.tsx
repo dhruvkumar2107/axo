@@ -65,8 +65,8 @@ export function Details() {
                 sizes="(max-width: 640px) 92vw, 40vw"
               />
               <figcaption className="flex items-baseline justify-between gap-4">
-                <span className="font-display text-fluid-md text-inkwarm/85">{item.label}</span>
-                <span className="label text-[0.5rem] text-inkwarm/35">
+                <span className="font-display text-fluid-md fg-paper">{item.label}</span>
+                <span className="label text-[0.5rem] fg-paper-faint">
                   {String(index + 1).padStart(2, '0')}
                 </span>
               </figcaption>

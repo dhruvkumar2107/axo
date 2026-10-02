@@ -5,6 +5,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 import { MediaFrame } from '@/components/primitives/MediaFrame';
+import { ArchWatermark, CornerLamp } from '@/components/art/Manapam';
 import { SceneHeading } from '@/components/motion/Reveal';
 import { config } from '@/lib/site';
 import { scroll } from '@/lib/scroll';
@@ -32,12 +33,36 @@ if (typeof window !== 'undefined') {
 
 export function Story() {
   const rootRef = useRef<HTMLElement>(null);
+  const archRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const root = rootRef.current;
     if (!root || scroll.reduceMotion) return;
 
     const ctx = gsap.context(() => {
+      /*
+       * The arch behind the story drifts against the page. It moves at a
+       * fraction of the scroll rate and never more than a few percent, which is
+       * what makes a flat watermark read as standing behind the content rather
+       * than printed on it. Transform only, so it never costs layout.
+       */
+      if (archRef.current) {
+        gsap.fromTo(
+          archRef.current,
+          { yPercent: -6 },
+          {
+            yPercent: 6,
+            ease: 'none',
+            scrollTrigger: {
+              trigger: root,
+              start: 'top bottom',
+              end: 'bottom top',
+              scrub: 0.9,
+            },
+          },
+        );
+      }
+
       // Each chapter's image drifts inside its own frame, at a third of the
       // rate of the page — the cheapest honest parallax there is.
       const frames = gsap.utils.toArray<HTMLElement>('[data-story-frame]');
@@ -85,20 +110,33 @@ export function Story() {
       ref={rootRef}
       id="story"
       data-scene="story"
-      className="scene material-velvet scene-pad relative isolate overflow-hidden px-[var(--gutter)]"
+      className="scene scene-paper paper paper-grain scene-pad relative isolate overflow-hidden px-[var(--gutter)]"
       aria-labelledby="story-heading"
     >
-      {/* A single pool of warm light, high and off-centre. */}
+      {/*
+        A single pool of warm light, high and off-centre — the light that falls
+        through a temple doorway in the late afternoon.
+      */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 -z-10"
         style={{
           background:
-            'radial-gradient(80% 55% at 22% 12%, rgba(232,217,160,0.10), transparent 62%)',
+            'radial-gradient(80% 55% at 22% 6%, rgb(232 217 178 / 0.5), transparent 62%)',
         }}
       />
 
+      {/* The temple sits behind the whole story, at the opacity of a watermark
+          pressed into the sheet rather than printed on it. */}
+      <div ref={archRef} className="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
+        <ArchWatermark />
+      </div>
+
       <div className="relative mx-auto flex w-full max-w-6xl flex-col gap-[clamp(4rem,11vh,8rem)]">
+        {/* A lit lamp at the shoulder of the section, the way one is set on the
+            floor beside the frame in a house. */}
+        <CornerLamp className="pointer-events-none absolute -left-1 top-[38%] w-[1.7rem] opacity-70 sm:-left-6" />
+
         <SceneHeading
           label="Their Story"
           className="mx-auto"
@@ -148,14 +186,14 @@ export function Story() {
                 <span
                   data-story-index
                   aria-hidden="true"
-                  className="font-display text-fluid-2xl font-light leading-none text-gold/30"
+                  className="font-display text-fluid-2xl font-light leading-none text-gold-antique"
                 >
                   {chapter.index}
                 </span>
 
-                <p className="label text-gold/70">{chapter.chapter}</p>
+                <p className="label fg-paper-muted">{chapter.chapter}</p>
 
-                <h3 className="font-display text-fluid-xl font-light leading-[1.1] text-ivory text-balance">
+                <h3 className="font-display text-fluid-xl font-light leading-[1.1] fg-paper text-balance">
                   {chapter.title}
                 </h3>
 
@@ -163,7 +201,7 @@ export function Story() {
                   <span>◆</span>
                 </span>
 
-                <p className="max-w-[38ch] font-display text-fluid-sm leading-relaxed text-ivory/55">
+                <p className="max-w-[38ch] font-display text-fluid-sm leading-relaxed fg-paper-muted">
                   {chapter.body}
                 </p>
               </div>

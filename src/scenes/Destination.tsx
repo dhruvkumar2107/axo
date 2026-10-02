@@ -49,7 +49,7 @@ export function Destination() {
       ref={rootRef}
       id="destination"
       data-scene="destination"
-      className="scene material-cinema scene-pad relative isolate overflow-hidden px-[var(--gutter)]"
+      className="scene scene-paper paper paper-grain scene-pad relative isolate overflow-hidden px-[var(--gutter)]"
       aria-labelledby="destination-heading"
     >
       <div className="relative mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-[clamp(2.5rem,7vw,5rem)] lg:grid-cols-[1.05fr_1fr]">
@@ -71,12 +71,12 @@ export function Destination() {
 
           {/* The coordinates, set like a surveyor's note */}
           {coordinates ? (
-            <span className="label absolute bottom-5 left-5 text-[0.5rem] text-ivory/45">
+            <span className="label absolute bottom-5 left-5 text-[0.5rem] fg-night-muted">
               {coordinates.lat.toFixed(4)}&deg; N &middot; {coordinates.lng.toFixed(4)}&deg; E
             </span>
           ) : null}
 
-          <span className="label absolute bottom-5 right-5 flex items-center gap-2 text-[0.5rem] text-gold-light/75 transition-colors duration-500 group-hover:text-gold-pale">
+          <span className="label absolute bottom-5 right-5 flex items-center gap-2 text-[0.5rem] fg-brass-strong transition-colors duration-500 group-hover:fg-brass">
             Open in Maps
             <span
               aria-hidden="true"
@@ -89,15 +89,15 @@ export function Destination() {
 
         {/* --- The copy --------------------------------------------------- */}
         <div className="flex flex-col gap-7">
-          <SceneHeading label="The Destination" align="left">
+          <SceneHeading label="The Destination" tone="ivory" align="left">
             <span id="destination-heading">{config.location.city}, {config.location.state}</span>
           </SceneHeading>
 
-          <p className="measure text-pretty font-display text-fluid-lg font-light leading-relaxed text-ivory/75">
+          <p className="measure text-pretty font-display text-fluid-lg font-light leading-relaxed fg-paper">
             {config.location.note}
           </p>
 
-          <dl className="flex flex-col gap-5 border-t border-gold/15 pt-7">
+          <dl className="flex flex-col gap-5 border-t border-gold-antique/25 pt-7">
             <Row label="City" value={config.location.city} />
             <Row label="Region" value={`${config.location.state}, ${config.location.country}`} />
             <Row
@@ -107,7 +107,7 @@ export function Destination() {
             <Row label="Exact venue" value="To be announced" muted />
           </dl>
 
-          <p className="label text-ivory/30">
+          <p className="label fg-paper-muted">
             Directions will be shared closer to the date
           </p>
         </div>
@@ -119,10 +119,10 @@ export function Destination() {
 function Row({ label, value, muted = false }: { label: string; value: string; muted?: boolean }) {
   return (
     <div className="flex items-baseline justify-between gap-6">
-      <dt className="label shrink-0 text-ivory/35">{label}</dt>
+      <dt className="label fg-paper-faint shrink-0">{label}</dt>
       <dd
         className={`text-right font-display text-fluid-md ${
-          muted ? 'italic text-ivory/40' : 'text-ivory/85'
+          muted ? 'italic fg-paper-muted' : 'fg-paper'
         }`}
       >
         {value}

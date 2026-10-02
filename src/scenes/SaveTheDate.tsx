@@ -251,18 +251,18 @@ export function SaveTheDate() {
     <section
       id="save-the-date"
       data-scene="save-the-date"
-      className="scene material-cinema scene-pad relative isolate flex flex-col items-center justify-center overflow-hidden px-[var(--gutter)]"
+      className="scene scene-paper paper paper-grain scene-pad relative isolate flex flex-col items-center justify-center overflow-hidden px-[var(--gutter)]"
       aria-labelledby="save-the-date-heading"
     >
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 -z-10"
         style={{
-          background: 'radial-gradient(70% 50% at 50% 42%, rgba(232,217,160,0.13), transparent 65%)',
+          background: 'radial-gradient(70% 50% at 50% 42%, rgb(232 217 178 / 0.5), transparent 65%)',
         }}
       />
 
-      <SceneHeading label="Save the date" className="mx-auto">
+      <SceneHeading label="Save the date" tone="ivory" className="mx-auto">
         <span id="save-the-date-heading">The seventeenth of October</span>
       </SceneHeading>
 
@@ -277,27 +277,27 @@ export function SaveTheDate() {
         >
           {/* The card itself: ivory, gold-edged, with the date pressed in. */}
           <div className="material-ivory absolute inset-0 flex flex-col items-center justify-between overflow-hidden px-[9%] py-[9%] shadow-[0_50px_110px_-60px_rgba(0,0,0,0.95)]">
-            <span aria-hidden="true" className="pointer-events-none absolute inset-[3%] border border-gold/45" />
-            <span aria-hidden="true" className="pointer-events-none absolute inset-[4.4%] border border-gold/20" />
+            <span aria-hidden="true" className="pointer-events-none absolute inset-[3%] border border-gold-antique/45" />
+            <span aria-hidden="true" className="pointer-events-none absolute inset-[4.4%] border border-gold-antique/20" />
 
-            <p className="label text-inkwarm/50">Save the date</p>
+            <p className="label fg-paper-muted">Save the date</p>
 
             {/* The date, embossed into the paper */}
             <div className="flex flex-col items-center gap-1">
-              <p className="foil foil-emboss font-display text-[clamp(5rem,26vw,10rem)] font-light leading-[0.8] tracking-[0.02em]">
+              <p className="foil-ink font-display text-[clamp(5rem,26vw,10rem)] font-light leading-[0.8] tracking-[0.02em]">
                 {config.date.day}
               </p>
-              <p className="font-display text-[clamp(1.1rem,5vw,1.9rem)] font-light uppercase tracking-[0.44em] text-inkwarm/85">
+              <p className="font-display text-[clamp(1.1rem,5vw,1.9rem)] font-light uppercase tracking-[0.44em] text-maroon">
                 {config.date.month}
               </p>
-              <p className="label mt-2 text-inkwarm/55">{config.location.city}</p>
+              <p className="label mt-2 fg-paper-muted">{config.location.city}</p>
             </div>
 
             <div className="flex flex-col items-center gap-2">
               <span aria-hidden="true" className="rule w-full max-w-[12rem]">
                 <span>◆</span>
               </span>
-              <p className="font-display text-[clamp(0.8rem,3vw,0.95rem)] italic text-inkwarm/55">
+              <p className="font-display text-[clamp(0.8rem,3vw,0.95rem)] italic fg-paper-muted">
                 {site.names}
               </p>
             </div>
@@ -354,7 +354,7 @@ export function SaveTheDate() {
               Reveal without scratching
             </button>
           ) : (
-            <p className="label text-ivory/30" aria-live="polite">
+            <p className="label fg-paper-faint" aria-live="polite">
               {config.date.day} {config.date.month} &middot; {config.location.label}
             </p>
           )}

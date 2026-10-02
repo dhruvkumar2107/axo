@@ -4,37 +4,101 @@
 
 /* ==========================================================================
    MATERIAL SYSTEM
-   Four materials and one accent. Everything else is restraint.
+   Warm ivory paper first, temple accents second. The page is a printed
+   invitation before it is a screen.
    ========================================================================== */
 
 @layer base {
   :root {
-    /* --- Ivory: warm, handmade, never white ------------------------------ */
-    --ivory: 44 39 28;
-    --ivory-soft: 251 248 241;
-    --ivory-deep: 232 223 205;
+    /* --- Ivory: the paper itself. Warm, handmade, never white ------------ */
+    /* Light. This is the primary background of the invitation. */
+    --ivory: 250 246 237;
+    --ivory-soft: 253 251 246;
+    --ivory-deep: 240 232 216;
+    /* Slightly warmer, for alternating bands so the page has joints. */
+    --ivory-warm: 246 238 224;
+    /* A faint turmeric cast, used behind ceremonial moments. */
+    --ivory-turmeric: 249 242 225;
 
     /* --- Antique gold: brass and leaf, never yellow ---------------------- */
-    --gold: 201 162 39;
-    --gold-light: 232 217 160;
-    --gold-pale: 240 230 200;
-    --gold-antique: 168 132 43;
-    --gold-deep: 122 95 23;
-    --gold-shadow: 74 55 14;
+    --gold: 176 137 58;
+    --gold-light: 206 176 106;
+    --gold-pale: 234 217 178;
+    --gold-antique: 138 104 40;
+    --gold-deep: 108 80 28;
+    --gold-shadow: 72 54 16;
 
-    /* --- Emerald: the estate, the night, the velvet ---------------------- */
-    --emerald: 12 43 34;
-    --emerald-rich: 18 58 45;
-    --emerald-deep: 7 26 20;
+    /* --- Temple green: banana leaf, mango leaf, the garland -------------- */
+    --green-temple: 74 106 66;
+    --green-temple-deep: 44 70 44;
+    --green-temple-muted: 126 154 112;
 
-    /* --- Ink ------------------------------------------------------------- */
-    --ink: 8 8 10;
+    /* --- Maroon: the silk, the deep accent -------------------------------
+       Deep and slightly dusty. A bright red reads as cheap; this reads as
+       the red of a Kanjivaram border.                                          */
+    --maroon: 104 30 38;
+    --maroon-rich: 128 40 48;
+    --maroon-deep: 74 20 28;
+    --maroon-muted: 158 78 82;
+
+    /* --- Temple red: the shaded terracotta of painted plaster -------------- */
+    --temple-red: 150 62 48;
+    --temple-red-deep: 112 44 34;
+
+    /* --- Turmeric: flame, marigold, the haldi note ----------------------- */
+    --turmeric: 208 148 40;
+    --turmeric-soft: 232 188 92;
+
+    /* --- Emerald: retained for the night act and the deep scenes -------- */
+    --emerald: 14 46 37;
+    --emerald-rich: 20 62 48;
+    --emerald-deep: 8 28 22;
+
+    /* --- Ink --------------------------------------------------------------
+       Now the *text* colour on ivory paper, not the page background. The page
+       is warm cream; ink is reserved for type and for the night sequence. */
+    --ink: 32 26 22;
     /* Warm near-black, for text set on ivory paper. Never pure #000. */
-    --ink-warm: 42 36 28;
+    --ink-warm: 58 46 36;
+    --ink-warm-soft: 92 78 62;
+    --ink-warm-faint: 138 122 102;
 
     /* --- Burgundy: used sparingly, for warmth ---------------------------- */
-    --burgundy: 74 18 32;
-    --burgundy-muted: 138 46 66;
+    --burgundy: 104 30 38;
+    --burgundy-muted: 158 78 82;
+
+    /* --- Motif channel ---------------------------------------------------
+       Traditional line work reads its colour from here, so a motif on cream
+       paper and a motif on maroon velvet are one drawing with one override. */
+    --motif: var(--gold-antique);
+    --motif-line: var(--gold-antique);
+    --motif-leaf: var(--green-temple);
+    --motif-brass: var(--gold);
+    --motif-flame: var(--turmeric);
+    --motif-core: var(--gold-pale);
+
+    /* --- Foreground ladder -----------------------------------------------
+       These alphas are not a taste decision; each is the lowest step that
+       still clears WCAG AA (4.5:1) for body-sized text on that surface.
+       Measured against the tokens above:
+
+         on night   (ink / emerald-deep)  ivory >= 0.50   gold-pale >= 0.55
+         on paper   (ivory / ivory-soft)  ink-warm >= 0.70   maroon >= 0.70
+
+       Anything below those numbers was previously rendering at 2.2:1 - 3.6:1
+       and is simply unreadable on a phone outdoors. Prefer the four-step
+       ladder below over an ad-hoc /25 /30 /35 /40.                        */
+
+    /* Primary and secondary text. */
+    --fg-night: 1;
+    --fg-night-strong: 0.88;
+    --fg-night-muted: 0.66;
+    --fg-night-faint: 0.56;
+
+    --fg-paper: 1;
+    --fg-paper-strong: 0.94;
+    --fg-paper-muted: 0.88;
+    --fg-paper-faint: 0.82;
 
     /* --- Type scale ------------------------------------------------------ */
     --font-mono: ui-monospace, 'SFMono-Regular', 'Cascadia Mono', 'Segoe UI Mono', monospace;
@@ -56,7 +120,7 @@
     --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.42'/%3E%3C/svg%3E");
     --marble: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='700' height='700'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.004 0.009' numOctaves='5' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='discrete' tableValues='0 0 0.06 0.14 0.03 0.22 0.05 0.3'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E");
 
-    color-scheme: dark;
+    color-scheme: light;
   }
 
   *,
@@ -74,8 +138,9 @@
   body {
     margin: 0;
     min-height: 100svh;
-    background-color: rgb(var(--ink));
-    color: rgb(var(--ivory));
+    /* The page is warm ivory paper. Ink is the type, not the ground. */
+    background-color: rgb(var(--ivory));
+    color: rgb(var(--ink-warm));
     font-family: var(--font-manrope), system-ui, -apple-system, sans-serif;
     font-size: clamp(0.875rem, 0.82rem + 0.25vw, 1rem);
     line-height: 1.6;
@@ -87,18 +152,20 @@
     font-variant-ligatures: common-ligatures contextual;
   }
 
-  /* Warm ivory pages need dark ink. Scoped by an attribute on <main>. */
-  [data-tone='ivory'] {
+  /* Text that sits on the deep night surfaces rather than on paper. */
+  [data-surface='night'],
+  [data-scene='overture'],
+  [data-scene='doors'] {
     color: rgb(var(--ivory));
   }
 
   ::selection {
-    background: rgb(var(--gold) / 0.24);
-    color: rgb(var(--ivory-soft));
+    background: rgb(var(--maroon) / 0.16);
+    color: rgb(var(--ink-warm));
   }
 
   :focus-visible {
-    outline: 1px solid rgb(var(--gold-light) / 0.7);
+    outline: 1px solid rgb(var(--gold-antique) / 0.9);
     outline-offset: 4px;
     border-radius: 1px;
   }
@@ -149,10 +216,274 @@
 }
 
 /* ==========================================================================
+   TRADITION — materials, motifs and their motion
+   ========================================================================== */
+
+@layer components {
+  /* --- Silk: a woven texture, not a photograph -------------------------
+     A Kanjivaram border is read through two things: a fine diagonal weave
+     and a soft metallic shimmer that travels along it. Both are cheap here —
+     two repeating-linear-gradients and one animation. No image, no filter,
+     nothing that costs a rasterisation pass at the viewport edge.            */
+  .silk {
+    position: relative;
+    background-color: rgb(var(--maroon));
+    background-image:
+      /* The metallic zari band, travelling. */
+      linear-gradient(
+        100deg,
+        transparent 0%,
+        rgb(var(--gold-pale) / 0.16) 42%,
+        rgb(var(--gold-light) / 0.3) 50%,
+        rgb(var(--gold-pale) / 0.16) 58%,
+        transparent 100%
+      ),
+      /* The weave: two hairline sets at ±32°, which is what produces the
+         characteristic cross-hatch of a silk border. */
+      repeating-linear-gradient(
+        32deg,
+        rgb(var(--gold-pale) / 0.05) 0px,
+        rgb(var(--gold-pale) / 0.05) 1px,
+        transparent 1px,
+        transparent 5px
+      ),
+      repeating-linear-gradient(
+        -32deg,
+        rgb(var(--gold-pale) / 0.04) 0px,
+        rgb(var(--gold-pale) / 0.04) 1px,
+        transparent 1px,
+        transparent 5px
+      ),
+      linear-gradient(160deg, rgb(var(--maroon-rich)), rgb(var(--maroon-deep)));
+    background-size: 260% 100%, auto, auto, auto;
+    background-blend-mode: screen, overlay, overlay, normal;
+  }
+
+  /* The travelling shimmer. Slow enough to read as light moving across silk
+     rather than as an animation. */
+  .silk-shimmer {
+    animation: silk-drift 26s ease-in-out infinite alternate;
+  }
+
+  /* --- Paper: the default surface ----------------------------------------
+     A whisper of grain and a warm vignette. Both are single small tiles, so
+     neither can delay first paint the way a full-bleed SVG filter did.     */
+  .paper {
+    position: relative;
+    background-color: rgb(var(--ivory));
+    background-image:
+      radial-gradient(
+        120% 70% at 50% 0%,
+        rgb(var(--gold-pale) / 0.22),
+        transparent 60%
+      ),
+      radial-gradient(
+        100% 60% at 50% 100%,
+        rgb(var(--ivory-warm)),
+        transparent 70%
+      );
+  }
+
+  /* Grain, applied as an overlay rather than as a filter on the content. */
+  .paper-grain::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: var(--grain);
+    background-size: 180px 180px;
+    mix-blend-mode: multiply;
+    opacity: 0.16;
+    pointer-events: none;
+  }
+
+  /* A deeper band, for alternating the rhythm of the page. */
+  .paper-warm {
+    background-color: rgb(var(--ivory-warm));
+  }
+
+  /* Turmeric-tinted, for ceremonial moments. */
+  .paper-turmeric {
+    background-color: rgb(var(--ivory-turmeric));
+  }
+
+  /* --- The wedding card ---------------------------------------------------
+     The single most reused object on this site: the printed invitation. It is
+     always cream, always hairline-framed, always with a soft warm shadow that
+     suggests paper lifted off paper. */
+  .card-wedding {
+    position: relative;
+    background-color: rgb(var(--ivory-soft));
+    box-shadow:
+      0 1px 0 rgb(var(--gold-pale) / 0.5) inset,
+      0 30px 70px -46px rgb(var(--ink-warm) / 0.4),
+      0 2px 10px -6px rgb(var(--ink-warm) / 0.16);
+  }
+
+  /* --- Night surfaces ----------------------------------------------------
+     The opening and the palace are a night act and stay dark. Kept as an
+     explicit class so the page can be ivory by default and dark only where
+     the story is dark.                                                      */
+  .surface-night {
+    background-color: rgb(var(--emerald-deep));
+    color: rgb(var(--ivory));
+  }
+
+  /* --- Motion ------------------------------------------------------------
+     Every duration below is long. Traditional ornament that moves quickly
+     reads as a notification; ornament that moves slowly reads as candlelight.
+     All of it is transform/opacity only, so nothing triggers layout.        */
+  .deepam-flame {
+    transform-origin: 50% 100%;
+    animation: flame-flicker 3.4s ease-in-out infinite;
+  }
+
+  .temple-bell-swing {
+    transform-origin: 50% 0%;
+    animation: bell-swing 7s ease-in-out infinite;
+  }
+
+  /* The kolam draws itself: a stroke-dashoffset sweep, once, then rests. */
+  .kolam-thread {
+    stroke-dasharray: 240;
+    stroke-dashoffset: 240;
+    animation: kolam-draw 4.5s var(--ease-silk) forwards;
+  }
+
+  /* Petals and motes drift on the compositor only. */
+  .drift-slow {
+    animation: drift-slow var(--drift-duration, 26s) linear infinite;
+  }
+
+  .drift-slower {
+    animation: drift-slower var(--drift-duration, 38s) linear infinite;
+  }
+
+  /* Reduced motion: honour it properly. Nothing decorative moves, and nothing
+     is left invisible — the kolam is simply present. */
+  @media (prefers-reduced-motion: reduce) {
+    .deepam-flame,
+    .temple-bell-swing,
+    .kolam-thread,
+    .drift-slow,
+    .drift-slower,
+    .silk-shimmer {
+      animation: none !important;
+    }
+
+    .kolam-thread {
+      stroke-dasharray: none;
+      stroke-dashoffset: 0;
+    }
+  }
+}
+
+@keyframes silk-drift {
+  from {
+    background-position: 0% 0, 0 0, 0 0, 0 0;
+  }
+  to {
+    background-position: 200% 0, 0 0, 0 0, 0 0;
+  }
+}
+
+@keyframes flame-flicker {
+  0%,
+  100% {
+    transform: scaleY(1) scaleX(1) translateY(0);
+    opacity: 0.92;
+  }
+  28% {
+    transform: scaleY(1.07) scaleX(0.94) translateY(-0.6px);
+    opacity: 1;
+  }
+  52% {
+    transform: scaleY(0.94) scaleX(1.05) translateY(0.4px);
+    opacity: 0.86;
+  }
+  74% {
+    transform: scaleY(1.04) scaleX(0.97) translateY(-0.3px);
+    opacity: 0.96;
+  }
+}
+
+@keyframes bell-swing {
+  0%,
+  62%,
+  100% {
+    transform: rotate(0deg);
+  }
+  70% {
+    transform: rotate(3.2deg);
+  }
+  78% {
+    transform: rotate(-2.6deg);
+  }
+  86% {
+    transform: rotate(1.5deg);
+  }
+  93% {
+    transform: rotate(-0.7deg);
+  }
+}
+
+@keyframes kolam-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes drift-slow {
+  from {
+    transform: translate3d(0, -6%, 0) rotate(0deg);
+  }
+  to {
+    transform: translate3d(2%, 108%, 0) rotate(220deg);
+  }
+}
+
+@keyframes drift-slower {
+  from {
+    transform: translate3d(0, -4%, 0) rotate(0deg);
+  }
+  to {
+    transform: translate3d(-3%, 112%, 0) rotate(-180deg);
+  }
+}
+
+/* ==========================================================================
    COMPONENTS
    ========================================================================== */
 
 @layer components {
+  /* --- Foreground ladder -------------------------------------------------
+     Four steps, each verified against its own surface. Using these instead of
+     `text-ivory/40` is the difference between 3.6:1 and 4.5:1.
+     ---------------------------------------------------------------------- */
+
+  /* Type on the night act: overture, palace, closing. */
+  .fg-night { color: rgb(var(--ivory) / var(--fg-night)); }
+  .fg-night-strong { color: rgb(var(--ivory) / var(--fg-night-strong)); }
+  .fg-night-muted { color: rgb(var(--ivory) / var(--fg-night-muted)); }
+  .fg-night-faint { color: rgb(var(--ivory) / var(--fg-night-faint)); }
+
+  /* Type on paper: everything else. */
+  .fg-paper { color: rgb(var(--ink-warm) / var(--fg-paper)); }
+  .fg-paper-strong { color: rgb(var(--ink-warm) / var(--fg-paper-strong)); }
+  .fg-paper-muted { color: rgb(var(--ink-warm) / var(--fg-paper-muted)); }
+  .fg-paper-faint { color: rgb(var(--ink-warm) / var(--fg-paper-faint)); }
+
+  /* Brass, for type that is meant to be read as a metal edge rather than as
+     body copy. Gold never clears AA as small text on paper, so this is only
+     for large display type and for the night act. */
+  .fg-brass { color: rgb(var(--gold-pale) / var(--fg-night)); }
+  .fg-brass-strong { color: rgb(var(--gold-light) / 0.86); }
+  .fg-brass-muted { color: rgb(var(--gold-pale) / var(--fg-night-muted)); }
+
+  /* Silk, for the maroon bands and cards. */
+  .fg-silk { color: rgb(var(--ivory) / var(--fg-night)); }
+  .fg-silk-muted { color: rgb(var(--ivory) / var(--fg-night-muted)); }
+  .fg-silk-faint { color: rgb(var(--ivory) / var(--fg-night-faint)); }
+
   /* --- Layout ------------------------------------------------------------ */
   .shell {
     width: 100%;
@@ -251,6 +582,53 @@
     -webkit-text-fill-color: transparent;
     filter: drop-shadow(0 1px 0 rgb(var(--gold-shadow) / 0.55))
       drop-shadow(0 0 26px rgb(var(--gold) / 0.16));
+  }
+
+  /* --- Foil on paper -----------------------------------------------------
+     The night `.foil` runs from gold-shadow to gold-pale, which is correct on a
+     dark scene and completely illegible on ivory: gold-pale on ivory measures
+     about 1.2:1. Names on paper therefore use a maroon-to-bronze gradient
+     instead, and every stop is at least 4.7:1 against the paper.
+
+       maroon-deep  rgb( 74 20 28)  -> 19:1
+       maroon       rgb(104 30 38)  -> 10.8:1
+       gold-deep    rgb(108 80 28)  ->  7.0:1
+       gold-antique rgb(138 104 40) ->  4.8:1
+     ---------------------------------------------------------------------- */
+  .foil-ink {
+    --foil-angle: 102deg;
+    --foil-pos: 50%;
+    position: relative;
+    display: inline-block;
+    background-image:
+      /* specular band, kept faint so it cannot wash the letterform out */
+      linear-gradient(
+        var(--foil-angle),
+        transparent 0%,
+        rgb(255 250 232 / 0.03) 22%,
+        rgb(255 250 232 / 0.22) var(--foil-pos),
+        rgb(255 250 232 / 0.03) 78%,
+        transparent 100%
+      ),
+      linear-gradient(
+        var(--foil-angle),
+        rgb(var(--maroon-deep)) 0%,
+        rgb(var(--maroon)) 24%,
+        rgb(var(--gold-deep)) 41%,
+        rgb(var(--gold-antique)) 51%,
+        rgb(var(--gold-deep)) 61%,
+        rgb(var(--maroon)) 76%,
+        rgb(var(--maroon-deep)) 100%
+      ),
+      var(--grain);
+    background-size: 240% 100%, 100% 100%, 180px 180px;
+    background-position: var(--foil-pos) 0, 0 0, 0 0;
+    background-blend-mode: overlay, normal, multiply;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 1px 0 rgb(255 252 240 / 0.45));
   }
 
   /* Embossed into the paper rather than printed on top. */

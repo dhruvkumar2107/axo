@@ -239,7 +239,7 @@ export function GoldHairline({
     <span
       ref={ref}
       aria-hidden="true"
-      className={cn('block h-px w-full origin-left bg-gold/45', className)}
+      className={cn('block h-px w-full origin-left bg-gold-antique/45', className)}
     />
   );
 }
@@ -267,9 +267,15 @@ export function SceneHeading({
   className?: string;
   align?: 'center' | 'left';
 }) {
-  const fg = tone === 'dark' ? 'text-ivory' : 'text-inkwarm';
-  const muted = tone === 'dark' ? 'text-ivory/45' : 'text-inkwarm/55';
-  const faint = tone === 'dark' ? 'text-ivory/55' : 'text-inkwarm/65';
+  /*
+   * Every heading and label in the invitation resolves its colour through this
+   * one switch, so there is exactly one place where the two surfaces are
+   * defined. The steps are the measured AA floor (see `globals.css`), not a
+   * taste ladder: the old /45 and /55 values rendered at 4.2:1 and 2.6:1.
+   */
+  const fg = tone === 'dark' ? 'fg-night' : 'fg-paper';
+  const muted = tone === 'dark' ? 'fg-night-muted' : 'fg-paper-muted';
+  const faint = tone === 'dark' ? 'fg-night-faint' : 'fg-paper-faint';
 
   return (
     <div

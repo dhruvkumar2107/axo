@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react';
+
 import Image from 'next/image';
 
 import { ProceduralArt } from '@/components/art/ProceduralArt';
@@ -25,6 +27,16 @@ export interface MediaFrameProps {
   className?: string;
   imageClassName?: string;
   align?: 'top' | 'center' | 'bottom';
+  /**
+   * Rendered as a `<figcaption>` inside this frame's `<figure>`.
+   *
+   * The caption lives here rather than in the caller because a `figcaption` is
+   * only valid as a direct child of `figure`. Callers that want a caption pass
+   * the node; callers that do not are unaffected.
+   */
+  caption?: ReactNode;
+  /** Extra classes on the caption, so the gallery can style its numbered label. */
+  captionClassName?: string;
 }
 
 export function MediaFrame({
@@ -38,6 +50,8 @@ export function MediaFrame({
   className,
   imageClassName,
   align = 'center',
+  caption,
+  captionClassName,
 }: MediaFrameProps) {
   const objectPosition = align === 'top' ? 'center top' : align === 'bottom' ? 'center bottom' : 'center';
 
@@ -76,6 +90,7 @@ export function MediaFrame({
         aria-hidden="true"
         className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-ink/55 to-transparent"
       />
+      {caption ? <figcaption className={cn('relative', captionClassName)}>{caption}</figcaption> : null}
     </figure>
   );
 }

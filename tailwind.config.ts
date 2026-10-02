@@ -1,8 +1,12 @@
 import type { Config } from 'tailwindcss';
 
 /**
- * The palette is intentionally narrow. Luxury here comes from restraint:
- * four materials (ivory, antique gold, emerald, ink) and one accent (burgundy).
+ * The palette is intentionally narrow. Luxury here comes from restraint.
+ *
+ * Warm ivory is the page; ink is the type. Maroon and temple green are the two
+ * accents, carried by silk and leaf; antique gold is the line work that ties
+ * them together. Every value is read from a CSS custom property so that the
+ * motif layer in `globals.css` and the utility classes here cannot drift apart.
  */
 const config: Config = {
   content: ['./src/**/*.{ts,tsx,mdx}'],
@@ -10,43 +14,70 @@ const config: Config = {
     extend: {
       colors: {
         ivory: {
-          DEFAULT: '#F4EFE4',
-          soft: '#FBF8F1',
-          deep: '#E8DFCD',
+          DEFAULT: 'rgb(var(--ivory))',
+          soft: 'rgb(var(--ivory-soft))',
+          deep: 'rgb(var(--ivory-deep))',
+          warm: 'rgb(var(--ivory-warm))',
+          turmeric: 'rgb(var(--ivory-turmeric))',
         },
         gold: {
-          DEFAULT: '#C9A227',
-          light: '#E8D9A0',
-          pale: '#F0E6C8',
-          antique: '#A8842B',
-          deep: '#7A5F17',
-          shadow: '#4A370E',
+          DEFAULT: 'rgb(var(--gold))',
+          light: 'rgb(var(--gold-light))',
+          pale: 'rgb(var(--gold-pale))',
+          antique: 'rgb(var(--gold-antique))',
+          deep: 'rgb(var(--gold-deep))',
+          shadow: 'rgb(var(--gold-shadow))',
         },
+        /* Banana leaf, mango leaf, the garland. */
+        templegreen: {
+          DEFAULT: 'rgb(var(--green-temple))',
+          deep: 'rgb(var(--green-temple-deep))',
+          muted: 'rgb(var(--green-temple-muted))',
+        },
+        /* The silk. Deep and dusty, never a bright red. */
+        maroon: {
+          DEFAULT: 'rgb(var(--maroon))',
+          rich: 'rgb(var(--maroon-rich))',
+          deep: 'rgb(var(--maroon-deep))',
+          muted: 'rgb(var(--maroon-muted))',
+        },
+        /* Shaded terracotta of painted temple plaster. */
+          templered: {
+          DEFAULT: 'rgb(var(--temple-red))',
+          deep: 'rgb(var(--temple-red-deep))',
+        },
+        /* Flame, marigold, haldi. */
+        turmeric: {
+          DEFAULT: 'rgb(var(--turmeric))',
+          soft: 'rgb(var(--turmeric-soft))',
+        },
+        /* The night act: opening and palace. */
         emerald: {
-          DEFAULT: '#0C2B22',
-          rich: '#123A2D',
-          deep: '#071A14',
-          muted: '#1E5142',
+          DEFAULT: 'rgb(var(--emerald))',
+          rich: 'rgb(var(--emerald-rich))',
+          deep: 'rgb(var(--emerald-deep))',
+          muted: 'rgb(var(--emerald-muted, 30 90 70))',
         },
         burgundy: {
-          DEFAULT: '#4A1220',
-          rich: '#6B1A2C',
-          muted: '#8A2E42',
+          DEFAULT: 'rgb(var(--burgundy))',
+          rich: 'rgb(var(--maroon-rich))',
+          muted: 'rgb(var(--burgundy-muted))',
         },
+        /* Type colour on paper. */
         ink: {
-          DEFAULT: '#08080A',
-          soft: '#101014',
-          muted: '#1B1B21',
+          DEFAULT: 'rgb(var(--ink))',
+          soft: 'rgb(var(--ink-warm-soft))',
+          muted: 'rgb(var(--ink-warm-faint))',
         },
         /* Warm near-black, for type set on ivory paper. */
         inkwarm: {
-          DEFAULT: '#2A241C',
-          soft: '#4A4034',
-          faint: '#7A6E5C',
+          DEFAULT: 'rgb(var(--ink-warm))',
+          soft: 'rgb(var(--ink-warm-soft))',
+          faint: 'rgb(var(--ink-warm-faint))',
         },
         brass: {
-          DEFAULT: '#9C7B33',
-          deep: '#6E5420',
+          DEFAULT: 'rgb(var(--gold))',
+          deep: 'rgb(var(--gold-deep))',
         },
       },
       fontFamily: {

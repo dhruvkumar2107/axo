@@ -4,6 +4,13 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 
 import { ProceduralArt } from '@/components/art/ProceduralArt';
+import {
+  HangingJasmine,
+  KolamDivider,
+  LampPair,
+  TempleFrame,
+  TempleHorizon,
+} from '@/components/art/Manapam';
 import { config, site } from '@/lib/site';
 import { useExperience } from '@/lib/experience';
 import { scroll } from '@/lib/scroll';
@@ -101,22 +108,34 @@ export function Overture({ stageReady, onStageReady }: OvertureProps) {
   return (
     <div
       ref={rootRef}
-      className="fixed inset-0 z-hud overflow-hidden bg-ink material-cinema"
+      className="surface-night material-cinema fixed inset-0 z-hud overflow-hidden"
       data-scene="overture"
     >
       {/* -------------------------------------------------------------------
-          Layer 0 — the estate. Art-directed vector scenery, inline in the
-          document, so it costs no request and paints on the first frame.
+          Layer 0 — the mandapam at night.
+
+          A wedding mandapam after dusk: the lamps are lit, the plaster is warm,
+          and everything beyond the arch falls away. The scene is carried by
+          gradients plus two line motifs rather than by a photograph, so it is
+          complete on the first frame and never blocks first paint.
           ------------------------------------------------------------------ */}
       <div className="absolute inset-0" aria-hidden="true">
-        <ProceduralArt art="couple" className="opacity-70" />
+        <ProceduralArt art="couple" className="opacity-40" />
+
+        {/* Warm plaster wash: the light the lamps throw on the back wall. */}
         <div
           className="absolute inset-0"
           style={{
             background:
-              'radial-gradient(118% 82% at 50% 60%, rgba(255,214,150,0.16) 0%, rgba(12,43,34,0.42) 40%, rgba(8,8,10,0.94) 78%)',
+              'radial-gradient(78% 52% at 50% 34%, rgb(var(--turmeric) / 0.22) 0%, rgb(var(--maroon) / 0.5) 44%, rgb(var(--emerald-deep)) 82%)',
           }}
         />
+
+        {/* The temple silhouette, sitting on the floor of the scene. */}
+        <TempleHorizon opacity={0.2} />
+
+        {/* The arch and its pillars, framing the monogram. */}
+        <TempleFrame />
       </div>
 
       {/* -------------------------------------------------------------------
@@ -136,14 +155,18 @@ export function Overture({ stageReady, onStageReady }: OvertureProps) {
           equivalent `blur()` here costs a full-viewport filter pass on the
           critical path to first paint, and a radial gradient is already soft. */}
       <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+        {/* Lamplight bloom, from the two deepams on the floor. */}
         <div
-          className="absolute inset-x-[-18%] top-[30%] h-[52vh]"
+          className="absolute inset-x-[-18%] bottom-[-10%] h-[58vh]"
           style={{
             background:
-              'radial-gradient(ellipse 60% 50% at 50% 50%, rgba(232,217,160,0.14) 0%, rgba(232,217,160,0.05) 42%, transparent 72%)',
+              'radial-gradient(ellipse 58% 46% at 50% 50%, rgb(var(--turmeric) / 0.2) 0%, rgb(var(--turmeric) / 0.07) 44%, transparent 74%)',
           }}
         />
         <div className="vignette absolute inset-0" />
+
+        {/* Jasmine, hung from the lintel. Two strands, unequal lengths. */}
+        <HangingJasmine count={2} />
       </div>
 
       {/* -------------------------------------------------------------------
@@ -156,17 +179,17 @@ export function Overture({ stageReady, onStageReady }: OvertureProps) {
         {/* --- Top: the date, small, as printed on a plate --- */}
         <p
           data-rise
-          className="label order-1 mt-[clamp(0.5rem,3vh,2rem)] text-center text-ivory/45"
+          className="label order-1 mt-[clamp(0.5rem,3vh,2rem)] text-center fg-night-muted"
         >
           {site.dateLabel.toUpperCase()}
-          <span className="mx-2 text-gold/45">&middot;</span>
+          <span className="mx-2 fg-brass-muted">&middot;</span>
           {config.location.city.toUpperCase()}
         </p>
 
         {/* --- Centre: the monogram, then the names --- */}
         <div className="order-2 flex flex-col items-center justify-center">
           {greeting ? (
-            <p data-rise className="label mb-[clamp(1.25rem,4vh,2.5rem)] text-ivory/40">
+            <p data-rise className="label mb-[clamp(1.25rem,4vh,2.5rem)] fg-night-muted">
               {greeting}
             </p>
           ) : null}
@@ -185,7 +208,7 @@ export function Overture({ stageReady, onStageReady }: OvertureProps) {
             >
               {site.namesStacked.groom}
             </p>
-            <p data-rise className="label text-gold/60">
+            <p data-rise className="label fg-brass-muted">
               {config.meta.monogramGlyph}
             </p>
             <p
@@ -195,14 +218,22 @@ export function Overture({ stageReady, onStageReady }: OvertureProps) {
               {site.namesStacked.bride}
             </p>
           </div>
+
+          {/* --- A kolam at the feet of the names: the floor of the mandapam --- */}
+          <div data-rise className="mt-[clamp(1.25rem,4vh,2.5rem)]">
+            <KolamDivider className="w-[3.25rem] opacity-45" />
+          </div>
         </div>
 
         {/* --- Bottom: the only call to action on the first screen --- */}
-        <div className="order-3 flex flex-col items-center gap-3">
+        <div className="order-3 flex w-full flex-col items-center gap-3">
+          {/* Lamps on the floor, flanking the plate a guest is about to press. */}
+          <LampPair className="w-full max-w-[22rem] opacity-70" />
+
           <button type="button" onClick={handleEnter} className="seal-button">
             Enter the celebration
           </button>
-          <p className="label text-[0.5rem] text-ivory/25" aria-hidden="true">
+          <p className="label text-[0.5rem] fg-night-faint" aria-hidden="true">
             {profile.isMobile ? 'Touch to begin' : 'Sound accompanies the invitation'}
           </p>
         </div>

@@ -188,19 +188,19 @@ export function Invitation() {
               />
 
               <div className="flex flex-col items-center gap-5 text-center">
-                <p className="label text-ivory/55">{config.invitation.openingLine}</p>
-                <Monogram size="lg" foil className="text-ivory" />
+                <p className="label fg-paper-muted">{config.invitation.openingLine}</p>
+                <Monogram size="lg" foil="ink" />
               </div>
 
               <div className="flex flex-col items-center gap-4 text-center">
                 <div className="flex flex-col items-center gap-1.5">
-                  <p className="font-display text-[clamp(1.35rem,5.4vw,2rem)] font-light leading-tight text-ivory">
+                  <p className="foil-ink font-display text-[clamp(1.35rem,5.4vw,2rem)] font-light leading-tight">
                     {site.namesStacked.groom}
                   </p>
-                  <span aria-hidden="true" className="font-display text-gold/70">
+                  <span aria-hidden="true" className="font-display text-gold-antique">
                     {config.meta.monogramGlyph}
                   </span>
-                  <p className="font-display text-[clamp(1.35rem,5.4vw,2rem)] font-light leading-tight text-ivory">
+                  <p className="foil-ink font-display text-[clamp(1.35rem,5.4vw,2rem)] font-light leading-tight">
                     {site.namesStacked.bride}
                   </p>
                 </div>
@@ -209,7 +209,7 @@ export function Invitation() {
                   <span>◆</span>
                 </span>
 
-                <p className="label text-ivory/60">{site.dateLabel}</p>
+                <p className="label fg-paper-muted">{site.dateLabel}</p>
               </div>
             </div>
 
@@ -235,25 +235,25 @@ export function Invitation() {
               />
 
               <div className="flex flex-col items-center gap-3 text-center">
-                <Monogram size="sm" foil />
+                <Monogram size="sm" foil="ink" />
                 <span aria-hidden="true" className="rule w-full">
                   <span>◆</span>
                 </span>
               </div>
 
               <div className="flex flex-col items-center gap-5 text-center">
-                <p className="max-w-[22ch] font-display text-[clamp(1rem,4.4vw,1.35rem)] font-light italic leading-relaxed text-ivory/85 text-balance">
+                <p className="max-w-[22ch] font-display text-[clamp(1rem,4.4vw,1.35rem)] font-light italic leading-relaxed fg-paper text-balance">
                   {config.invitation.body}
                 </p>
 
                 <div className="flex flex-col items-center gap-2">
-                  <p className="foil foil-emboss font-display text-[clamp(1.5rem,6vw,2.25rem)] font-light uppercase tracking-[0.16em]">
+                  <p className="foil-ink font-display text-[clamp(1.5rem,6vw,2.25rem)] font-light uppercase tracking-[0.16em]">
                     {site.dateLabel}
                   </p>
-                  <p className="label text-ivory/60">{config.location.label}</p>
+                  <p className="label fg-paper-muted">{config.location.label}</p>
                 </div>
 
-                <p className="max-w-[26ch] font-display text-[clamp(0.8rem,3.2vw,0.95rem)] italic text-ivory/55">
+                <p className="max-w-[26ch] font-display text-[clamp(0.8rem,3.2vw,0.95rem)] italic fg-paper-muted">
                   {config.invitation.closingLine}
                 </p>
               </div>
@@ -293,7 +293,7 @@ export function Invitation() {
 
         <p
           ref={hintRef}
-          className="label text-center text-ivory/45"
+          className="label text-center fg-paper-faint"
           aria-live="polite"
         >
           {state === 'sealed' ? 'Break the seal' : ''}

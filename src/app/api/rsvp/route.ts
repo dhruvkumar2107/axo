@@ -5,7 +5,9 @@ import {
   add,
   readAll,
   remove,
+  storageBackend,
   storageIsDurable,
+  storageIsMisconfigured,
   toCsv,
 } from '@/lib/server/rsvp-store';
 import { isAdmin, isAllowedOrigin, rateLimit, rateLimitKey } from '@/lib/server/http';
@@ -79,9 +81,18 @@ export async function GET(request: Request) {
   }
 
 return NextResponse.json(
-    { summary: summarise(records), records, durable: storageIsDurable() },
-    { headers: { 'Cache-Control': 'no-store' } },
-  );
+      {
+        summary: summarise(records),
+        records,
+        durable: storageIsDurable(),
+        // Named so /admin can say exactly where replies are going, and flag a
+        // half-configured durable store rather than quietly falling back to a
+        // throwaway file and losing every reply after the next deploy.
+        backend: storageBackend(),
+        misconfigured: storageIsMisconfigured(),
+      },
+      { headers: { 'Cache-Control': 'no-store' } },
+    );
 }
 
 /* --------------------------------------------------------------------------

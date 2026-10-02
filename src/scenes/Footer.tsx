@@ -1,6 +1,7 @@
 'use client';
 
 import { Monogram } from '@/components/primitives/Monogram';
+import { CornerLamp, HangingJasmine, LotusDivider } from '@/components/art/Manapam';
 import { config, site } from '@/lib/site';
 import { scrollTo } from '@/lib/scroll';
 
@@ -15,11 +16,20 @@ export function Footer() {
   const year = site.dateYear;
 
   return (
-    <footer className="relative border-t border-gold/12 bg-ink px-[var(--gutter)] pb-[max(2.5rem,env(safe-area-inset-bottom))] pt-[clamp(2.5rem,7vh,4rem)]">
-      <div className="mx-auto flex w-full max-w-6xl flex-col items-center gap-10 text-center">
-        <Monogram size="sm" foil />
+    <footer className="paper paper-grain relative border-t border-gold-antique/20 px-[var(--gutter)] pb-[max(2.5rem,env(safe-area-inset-bottom))] pt-[clamp(2.5rem,7vh,4rem)]">
+      {/* A jasmine strand across the head of the footer and a lamp on the
+          floor of it: the two ornaments that say "the ceremony is over" without
+          saying anything at all. */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 -z-10" aria-hidden="true">
+        <HangingJasmine count={2} />
+      </div>
 
-        <p className="font-display text-fluid-md italic text-ivory/50">{site.tagline}</p>
+      <div className="mx-auto flex w-full max-w-6xl flex-col items-center gap-10 text-center">
+        <CornerLamp className="w-[1.8rem] opacity-80" />
+
+        <Monogram size="sm" foil="ink" />
+
+        <p className="font-display text-fluid-md italic fg-paper-muted">{site.tagline}</p>
 
         {/* --- Practical links ------------------------------------------- */}
         <nav aria-label="Footer" className="flex flex-col items-center gap-6">
@@ -27,7 +37,7 @@ export function Footer() {
             href={config.location.mapUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="label text-ivory/45 transition-colors duration-500 hover:text-gold-light"
+            className="label fg-paper transition-colors duration-500 hover:text-maroon"
           >
             {config.location.label}
           </a>
@@ -38,7 +48,7 @@ export function Footer() {
                 <button
                   type="button"
                   onClick={() => scrollTo(`#${item.target}`, -40)}
-                  className="label text-[0.5rem] text-ivory/35 transition-colors duration-500 hover:text-gold-light"
+                  className="label text-[0.5rem] fg-paper-muted transition-colors duration-500 hover:text-maroon"
                 >
                   {item.label}
                 </button>
@@ -47,9 +57,11 @@ export function Footer() {
           </ul>
         </nav>
 
+        <LotusDivider className="w-[11rem] opacity-80" />
+
         {/* --- Colophon --------------------------------------------------- */}
         <div className="flex flex-col items-center gap-2">
-          <p className="label text-[0.5rem] text-ivory/25">
+          <p className="label text-[0.5rem] fg-paper-faint">
             {config.location.city} &middot; {config.date.day} {config.date.month}
             {/* The year is printed only once it is confirmed. */}
             {year && !site.dateYearAssumed ? ` ${year}` : ''}
@@ -57,7 +69,7 @@ export function Footer() {
           <button
             type="button"
             onClick={() => scrollTo(0, 0)}
-            className="label mt-3 text-[0.5rem] text-ivory/25 transition-colors duration-500 hover:text-gold-light"
+            className="label mt-3 text-[0.5rem] fg-paper-faint transition-colors duration-500 hover:text-maroon"
           >
             Return to the beginning
           </button>

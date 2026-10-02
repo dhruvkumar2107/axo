@@ -74,7 +74,7 @@ export function Countdown() {
     <section
       id="countdown"
       data-scene="countdown"
-      className="scene material-cinema scene-pad relative isolate flex flex-col items-center justify-center overflow-hidden px-[var(--gutter)]"
+      className="scene scene-paper paper paper-grain scene-pad relative isolate flex flex-col items-center justify-center overflow-hidden px-[var(--gutter)]"
       aria-labelledby="countdown-heading"
     >
       {/* A single warm source, low and centred, as if a lamp on the floor. */}
@@ -88,14 +88,14 @@ export function Countdown() {
       />
 
       <div ref={headingRef} className="flex flex-col items-center gap-[clamp(2.5rem,7vh,4.5rem)]">
-        <SceneHeading label={config.countdown.heading}>
+        <SceneHeading label={config.countdown.heading} tone="ivory">
           <span id="countdown-heading">
             {elapsed ? 'The celebration has begun' : 'Until we meet'}
           </span>
         </SceneHeading>
 
         {note ? (
-          <p className="font-display text-fluid-md italic text-ivory/45">{note}</p>
+          <p className="font-display text-fluid-md italic fg-paper-muted">{note}</p>
         ) : (
           /*
            * The figures. Each unit is a group so the label never reflows the
@@ -122,13 +122,13 @@ export function Countdown() {
                 ) : null}
 
                 <span
-                  className="tnum foil font-display text-[clamp(2.75rem,13vw,6rem)] font-light leading-none tracking-[0.02em]"
+                  className="tnum foil-ink font-display text-[clamp(2.75rem,13vw,6rem)] font-light leading-none tracking-[0.02em]"
                   style={{ ['--foil-pos' as string]: '42%' }}
                 >
                   {parts ? String(parts[unit.key]).padStart(2, '0') : '--'}
                 </span>
 
-                <span className="label text-[0.5rem] text-ivory/35">{unit.label}</span>
+                <span className="label text-[0.5rem] fg-paper-faint">{unit.label}</span>
               </div>
             ))}
           </div>
@@ -139,7 +139,7 @@ export function Countdown() {
           <span aria-hidden="true" className="rule w-full max-w-[16rem]">
             <span>◆</span>
           </span>
-          <p className="label text-ivory/40">
+          <p className="label fg-paper-muted">
             {site.dateLabel} &middot; {config.location.city}
           </p>
         </div>

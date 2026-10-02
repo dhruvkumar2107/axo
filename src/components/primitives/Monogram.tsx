@@ -33,8 +33,15 @@ export interface MonogramProps {
   size?: MonogramSize;
   /** Draw a fine engraved ring around the letters. */
   withRing?: boolean;
-  /** Apply the gold foil treatment to the letters. */
-  foil?: boolean;
+  /**
+   * Apply the gold foil treatment to the letters.
+   *
+   * `'gold'` is the real metallic ramp and belongs on night and silk surfaces.
+   * `'ink'` is the darkened ramp for ivory paper: the gold gradient's light
+   * stops drop below 3:1 on ivory, so a small monogram there is decoration
+   * pretending to be a label.
+   */
+  foil?: 'gold' | 'ink';
   /** Show the hairline rule and the date, as on the invitation seal. */
   /** Animate the ring drawing itself in. Used only on the entry sequence. */
   draw?: boolean;
@@ -46,7 +53,7 @@ export interface MonogramProps {
 export function Monogram({
   size = 'md',
   withRing = false,
-  foil = false,
+  foil,
   draw = false,
   className,
   label = `Monogram: ${config.meta.monogram}`,
@@ -61,7 +68,7 @@ export function Monogram({
         'inline-flex items-baseline font-display leading-none tracking-[0.02em]',
         gap,
         text,
-        foil ? 'foil' : 'text-current',
+        foil === 'gold' ? 'foil' : foil === 'ink' ? 'foil-ink' : 'text-current',
       )}
       aria-hidden="true"
     >

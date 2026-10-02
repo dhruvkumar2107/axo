@@ -27,12 +27,23 @@ import {
 export function ShareActions({
   className,
   compact = false,
+  tone = 'paper',
 }: {
   className?: string;
   compact?: boolean;
+  /**
+   * Which surface this sits on. The hint line is muted text, and the two
+   * surfaces need genuinely different alphas to clear 4.5:1: ivory over maroon
+   * silk needs 0.66, ink over ivory paper needs 0.88. Getting this wrong is what
+   * left the closing scene's hint at 2.95:1.
+   */
+  tone?: 'paper' | 'silk';
 }) {
   const { cue } = useAudio();
   const [notice, setNotice] = useState<string | null>(null);
+
+  const hint = tone === 'silk' ? 'fg-silk-muted' : 'fg-paper-muted';
+  const noticeTone = tone === 'silk' ? 'fg-brass-muted' : 'text-maroon';
 
   const say = useCallback(
     (message: string) => {
@@ -98,11 +109,16 @@ export function ShareActions({
       </div>
 
       {/* The exact message a guest will send, shown so nothing is a surprise. */}
-      <p className="measure max-w-[46ch] text-center font-display text-[clamp(0.78rem,3vw,0.9rem)] italic leading-relaxed text-ivory/40">
+      <p
+        className={`measure max-w-[46ch] text-center font-display text-[clamp(0.78rem,3vw,0.9rem)] italic leading-relaxed ${hint}`}
+      >
         &ldquo;{shareMessage(currentOrigin() || invitationUrl())}&rdquo;
       </p>
 
-      <p className="label min-h-[1.2em] text-center text-[0.5rem] text-gold/70" aria-live="polite">
+      <p
+        className={`label min-h-[1.2em] text-center text-[0.5rem] ${noticeTone}`}
+        aria-live="polite"
+      >
         {notice ?? ''}
       </p>
 

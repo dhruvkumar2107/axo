@@ -89,6 +89,12 @@ export function SiteNav() {
 
   return (
     <>
+{/*
+        The header is fixed and the page beneath it alternates between paper and
+        night scenes, so it cannot rely on inheriting contrast from whatever is
+        behind it. It carries its own ivory plate with a hairline gold rule -
+        the printed letterhead edge - which makes it legible over both.
+      */}
       <motion.header
         ref={headerRef}
         initial={false}
@@ -97,56 +103,55 @@ export function SiteNav() {
         className="fixed inset-x-0 top-0 z-hud"
         style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top))' }}
       >
-        <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-6 px-[var(--gutter)]">
-          <button
-            type="button"
-            onClick={() => go('hero')}
-            aria-label="Return to the top"
-            className="opacity-70 transition-opacity duration-500 hover:opacity-100"
-          >
-            <Monogram size="xs" foil />
-          </button>
+        <div className="border-b border-gold-antique/15 bg-ivory/88 backdrop-blur-md">
+          <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-6 px-[var(--gutter)] py-3">
+            <button
+              type="button"
+              onClick={() => go('hero')}
+              aria-label="Return to the top"
+              className="opacity-80 transition-opacity duration-500 hover:opacity-100"
+            >
+              <Monogram size="xs" foil="ink" />
+            </button>
 
-          {/* --- Desktop: the scene row ---------------------------------- */}
-          <nav aria-label="Scenes" className="hidden lg:block">
-            <ul className="flex items-center gap-7">
-              {config.nav.map((item) => (
-                <li key={item.target}>
-                  <button
-                    type="button"
-                    onClick={() => go(item.target)}
-                    aria-current={active === item.target ? 'true' : undefined}
-                    className={cn(
-                      'label text-[0.5rem] transition-colors duration-500',
-                      active === item.target ? 'text-gold-light' : 'text-ivory/40 hover:text-ivory/80',
-                    )}
-                  >
-                    {item.label}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </nav>
+            {/* --- Desktop: the scene row ---------------------------------- */}
+            <nav aria-label="Scenes" className="hidden lg:block">
+              <ul className="flex items-center gap-7">
+                {config.nav.map((item) => (
+                  <li key={item.target}>
+                    <button
+                      type="button"
+                      onClick={() => go(item.target)}
+                      aria-current={active === item.target ? 'true' : undefined}
+                      className={cn(
+                        'label text-[0.5rem] transition-colors duration-500',
+                        active === item.target
+                          ? 'text-maroon'
+                          : 'fg-paper-muted hover:fg-paper-strong',
+                      )}
+                    >
+                      {item.label}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </nav>
 
-          {/* --- Mobile: one seal ----------------------------------------- */}
-          <button
-            type="button"
-            onClick={() => setOpen(true)}
-            aria-label="Open the menu"
-            aria-expanded={open}
-            className="grid size-11 place-items-center rounded-full border border-gold/25 lg:hidden"
-          >
-            <span aria-hidden="true" className="flex flex-col items-center gap-[5px]">
-              <span className="block h-px w-4 bg-gold-light" />
-              <span className="block h-px w-4 bg-gold-light" />
-              <span className="block h-px w-4 bg-gold-light" />
-            </span>
-          </button>
-        </div>
-
-        {/* A hairline that appears once the guest has begun to move. */}
-        <div className="mx-auto mt-3 h-px w-full max-w-6xl px-[var(--gutter)]">
-          <div className="h-px bg-gradient-to-r from-transparent via-gold/15 to-transparent" />
+            {/* --- Mobile: one seal ----------------------------------------- */}
+            <button
+              type="button"
+              onClick={() => setOpen(true)}
+              aria-label="Open the menu"
+              aria-expanded={open}
+              className="grid size-11 place-items-center rounded-full border border-gold-antique/40 transition-colors duration-500 hover:border-gold-antique/70 lg:hidden"
+            >
+              <span aria-hidden="true" className="flex flex-col items-center gap-[5px]">
+                <span className="block h-px w-4 bg-maroon/70" />
+                <span className="block h-px w-4 bg-maroon/70" />
+                <span className="block h-px w-4 bg-maroon/70" />
+              </span>
+            </button>
+          </div>
         </div>
       </motion.header>
 
@@ -191,13 +196,13 @@ export function SiteNav() {
                         onClick={() => go(target)}
                         className="flex w-full items-baseline gap-5 py-2 text-left"
                       >
-                        <span className="label text-[0.5rem] text-gold/50">
+                        <span className="label text-[0.5rem] fg-brass-muted">
                           {String(index + 1).padStart(2, '0')}
                         </span>
                         <span
                           className={cn(
                             'font-display text-fluid-xl font-light',
-                            active === target ? 'text-gold-light' : 'text-ivory/85',
+                            active === target ? 'fg-brass-strong' : 'fg-night-strong',
                           )}
                         >
                           {item.label}
@@ -212,7 +217,7 @@ export function SiteNav() {
             <motion.button
               type="button"
               onClick={() => setOpen(false)}
-              className="label relative mt-12 self-start text-ivory/50"
+              className="label relative mt-12 self-start fg-night-muted"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5, duration: 0.6 }}

@@ -26,24 +26,24 @@ export function Blessings() {
     <section
       id="blessings"
       data-scene="blessings"
-      className="scene material-cinema scene-pad relative isolate flex flex-col items-center overflow-hidden px-[var(--gutter)] text-center"
+      className="scene scene-paper paper paper-grain scene-pad relative isolate flex flex-col items-center overflow-hidden px-[var(--gutter)] text-center"
       aria-labelledby="blessings-heading"
     >
       {/* A toran drawn faintly across the top, as if over a doorway. */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[34vh] opacity-[0.35]"
+        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[34vh] opacity-45"
       >
         <ProceduralArt art="toran" />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-ink" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-ivory" />
       </div>
 
       <div className="relative mx-auto flex w-full max-w-3xl flex-col items-center gap-[clamp(2.5rem,7vh,4.5rem)]">
-        <SceneHeading label="With Blessings" className="mx-auto">
+        <SceneHeading label="With Blessings" tone="ivory" className="mx-auto">
           <span id="blessings-heading">{config.invitation.blessingsLine}</span>
         </SceneHeading>
 
-        <p className="measure max-w-[30ch] text-balance font-display text-fluid-2xl font-light italic leading-[1.25] text-ivory/80">
+        <p className="measure max-w-[30ch] text-balance font-display text-fluid-2xl font-light italic leading-[1.25] fg-paper">
           {config.invitation.openingLine}
         </p>
 
@@ -65,19 +65,19 @@ export function Blessings() {
             <span aria-hidden="true" className="rule w-full max-w-[14rem]">
               <span>◆</span>
             </span>
-            <p className="measure max-w-[40ch] font-display text-fluid-sm italic leading-relaxed text-ivory/40">
+            <p className="measure max-w-[40ch] font-display text-fluid-sm italic leading-relaxed fg-paper-muted">
               With gratitude to the families who made this day possible.
             </p>
           </div>
         )}
 
         {note ? (
-          <p className="measure max-w-[44ch] font-display text-fluid-sm italic text-ivory/45">
+          <p className="measure max-w-[44ch] font-display text-fluid-sm italic fg-paper-muted">
             {note}
           </p>
         ) : null}
 
-        <p className="label text-ivory/25">{site.tagline}</p>
+        <p className="label fg-paper-faint">{site.tagline}</p>
       </div>
     </section>
   );
@@ -86,10 +86,10 @@ export function Blessings() {
 function FamilyColumn({ title, names }: { title: string; names: string[] }) {
   return (
     <div className="flex flex-col items-center gap-4">
-      <p className="label text-gold/60">{title}</p>
+      <p className="label text-maroon">{title}</p>
       <ul className="flex flex-col items-center gap-2">
         {names.map((name) => (
-          <li key={name} className="font-display text-fluid-lg font-light text-ivory/85">
+          <li key={name} className="font-display text-fluid-lg font-light fg-paper">
             {name}
           </li>
         ))}

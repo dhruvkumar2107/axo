@@ -1,7 +1,10 @@
-import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, rename, writeFile, access } from 'node:fs/promises';
+import { constants } from 'node:fs';
 import { randomUUID } from 'node:crypto';
+import os from 'node:os';
 import path from 'node:path';
 
+import * as upstash from '@/lib/server/rsvp-store-upstash';
 import type { RsvpRecord, RsvpSubmission } from '@/lib/rsvp';
 
 /**
@@ -9,30 +12,82 @@ import type { RsvpRecord, RsvpSubmission } from '@/lib/rsvp';
  *  RSVP STORE
  * ============================================================================
  *
- *  A JSON file, written atomically. That is the whole point: this invitation
- *  serves one wedding, from one small deployment, and needs a few hundred
- *  replies — not a database.
+ *  Two backends behind one surface: an Upstash Redis hash when its credentials
+ *  are configured, and an atomically-written JSON file otherwise. `readAll` and
+ *  `add` are the entire surface, so nothing upstream — the API route or the
+ *  admin page — knows or cares which one answered.
  *
- *  Why this shape still holds up:
+ *  The file backend is the right default for a single wedding from a single
+ *  small deployment: a few hundred replies is not a database. It is also the
+ *  wrong default on a host with an ephemeral filesystem, which is why the
+ *  durable backend exists and why `storageIsDurable()` says so out loud.
  *
- *    · atomic — every write goes to a temporary file and is renamed over the
- *      real one, so a crash mid-write can never truncate the guest list
+ *  Why this shape holds up:
+ *
+ *    · atomic — every file write goes to a temporary file and is renamed over
+ *      the real one, so a crash mid-write can never truncate the guest list
  *    · serialised — a promise queue means two guests replying in the same
  *      millisecond cannot clobber each other
- *    · swappable — `readAll` / `add` is the entire surface. Replacing this file
- *      with Postgres, a hosted KV, or Google Sheets is a contained change, and
- *      nothing upstream knows or cares.
+ *    · swappable — swapping in Postgres or Google Sheets is a contained change
  *
  *  Privacy: no IP addresses, no user agents, no tracking. A reply contains only
- *  what the guest typed. The file is written to `RSVP_DATA_DIR`, which should sit
- *  outside `public/` and is excluded from version control.
+ *  what the guest typed. The file is written outside `public/` and is excluded
+ *  from version control.
  */
 
-const DATA_DIR = process.env.RSVP_DATA_DIR
-  ? path.resolve(process.env.RSVP_DATA_DIR)
-  : path.join(process.cwd(), 'data');
+/** Which backend actually answered the last call. Shown to the family in /admin. */
+export type StorageBackend = 'upstash' | 'file';
 
-const DATA_FILE = path.join(DATA_DIR, 'rsvp.json');
+/**
+ * Candidate directories for the file backend, best first.
+ *
+ * `RSVP_DATA_DIR` is the real answer when it is set: a mounted volume survives
+ * deploys. Everything after it is a fallback for hosts that give the process a
+ * read-only filesystem — Vercel builds into `/var/task`, so `process.cwd()/data`
+ * throws `EROFS` there and every reply was returning a 500 to the guest.
+ *
+ * The OS temp directory is writable on those hosts, so a reply is at least
+ * accepted and readable for the life of the instance. That is still ephemeral,
+ * which is why `storageIsDurable()` says so out loud rather than pretending.
+ */
+const CANDIDATE_DIRS = [
+  process.env.RSVP_DATA_DIR ? path.resolve(process.env.RSVP_DATA_DIR) : null,
+  path.join(process.cwd(), 'data'),
+  path.join(os.tmpdir(), 'wedding-invitation-rsvp'),
+].filter((dir): dir is string => Boolean(dir));
+
+let resolvedDir: string | null = null;
+
+/**
+ * The first candidate directory we can actually write to.
+ *
+ * Resolved once per instance and cached: the answer cannot change while the
+ * process is alive, and probing on every reply would mean a filesystem round
+ * trip in the guest's path.
+ */
+async function writableDir(): Promise<string> {
+  if (resolvedDir) return resolvedDir;
+
+  for (const dir of CANDIDATE_DIRS) {
+    try {
+      await mkdir(dir, { recursive: true });
+      await access(dir, constants.W_OK);
+      resolvedDir = dir;
+      return dir;
+    } catch {
+      // Read-only or unavailable — try the next candidate.
+    }
+  }
+
+  throw new Error(
+    `RSVP: no writable data directory. Tried ${CANDIDATE_DIRS.join(', ')}. ` +
+      'Set RSVP_DATA_DIR to a mounted volume.',
+  );
+}
+
+async function dataFile(): Promise<string> {
+  return path.join(await writableDir(), 'rsvp.json');
+}
 
 /**
  * Whether these replies can actually be relied on to still be there tomorrow.
@@ -43,15 +98,27 @@ const DATA_FILE = path.join(DATA_DIR, 'rsvp.json');
  * possible kind — so the admin page is told about it out loud rather than the
  * family discovering an empty list the week after the wedding.
  *
- * Set `RSVP_DATA_DIR` to a mounted volume, or swap this one file for a database,
- * and this reports `true` on its own.
+ * Durable when the Upstash credentials are set, or when `RSVP_DATA_DIR` points
+ * somewhere the host preserves. The temp-directory fallback keeps a reply from
+ * being refused, but it is not a promise that it will still be there.
  */
 export function storageIsDurable(): boolean {
-  if (process.env.RSVP_DATA_DIR) return true;
-  if (process.env.VERCEL) return false;
-  if (process.env.AWS_LAMBDA_FUNCTION_NAME) return false;
-  if (process.env.NETLIFY) return false;
-  return true;
+  return upstash.upstashConfigured() || Boolean(process.env.RSVP_DATA_DIR);
+}
+
+/** Name the live backend so /admin can tell the family where replies are going. */
+export function storageBackend(): StorageBackend {
+  return upstash.upstashConfigured() ? 'upstash' : 'file';
+}
+
+/** Set when someone meant to configure Upstash but supplied only half of it. */
+export function storageIsMisconfigured(): boolean {
+  return upstash.upstashMisconfigured();
+}
+
+/** Whether the configured durable backend answers right now. */
+export function storageResponds(): Promise<boolean> {
+  return upstash.upstashConfigured() ? upstash.ping() : Promise.resolve(true);
 }
 
 /** Serialises every write. A queue of one is plenty for a single wedding. */
@@ -64,13 +131,15 @@ function enqueue<T>(task: () => Promise<T>): Promise<T> {
   return run;
 }
 
-async function ensureDir(): Promise<void> {
-  await mkdir(DATA_DIR, { recursive: true });
+export async function readAll(): Promise<RsvpRecord[]> {
+  if (upstash.upstashConfigured()) return upstash.readAll();
+  return readAllFromFile();
 }
 
-export async function readAll(): Promise<RsvpRecord[]> {
+async function readAllFromFile(): Promise<RsvpRecord[]> {
+  const file = await dataFile();
   try {
-    const contents = await readFile(DATA_FILE, 'utf8');
+    const contents = await readFile(file, 'utf8');
     const parsed: unknown = JSON.parse(contents);
     return Array.isArray(parsed) ? (parsed as RsvpRecord[]) : [];
   } catch (error) {
@@ -79,8 +148,7 @@ export async function readAll(): Promise<RsvpRecord[]> {
     if (error instanceof SyntaxError) {
       // Corrupt file: preserve it for inspection rather than silently destroying
       // the only copy of the guest list.
-      await ensureDir();
-      await rename(DATA_FILE, `${DATA_FILE}.corrupt-${Date.now()}`).catch(() => undefined);
+      await rename(file, `${file}.corrupt-${Date.now()}`).catch(() => undefined);
       return [];
     }
     throw error;
@@ -88,16 +156,20 @@ export async function readAll(): Promise<RsvpRecord[]> {
 }
 
 async function writeAll(records: RsvpRecord[]): Promise<void> {
-  await ensureDir();
-  const temporary = `${DATA_FILE}.${randomUUID()}.tmp`;
+  const file = await dataFile();
+  const temporary = `${file}.${randomUUID()}.tmp`;
   await writeFile(temporary, `${JSON.stringify(records, null, 2)}\n`, 'utf8');
-  await rename(temporary, DATA_FILE);
+  await rename(temporary, file);
 }
 
 /** Append one reply and return the stored record. */
 export function add(submission: RsvpSubmission): Promise<RsvpRecord> {
+  // The queue only guards the file backend. Redis writes are independent field
+  // updates to a hash, so two replies in the same millisecond are already safe.
+  if (upstash.upstashConfigured()) return upstash.add(submission);
+
   return enqueue(async () => {
-    const records = await readAll();
+    const records = await readAllFromFile();
     const now = new Date();
     const record: RsvpRecord = {
       ...submission,
@@ -112,8 +184,10 @@ export function add(submission: RsvpSubmission): Promise<RsvpRecord> {
 }
 
 export function remove(id: string): Promise<boolean> {
+  if (upstash.upstashConfigured()) return upstash.remove(id);
+
   return enqueue(async () => {
-    const records = await readAll();
+    const records = await readAllFromFile();
     const next = records.filter((record) => record.id !== id);
     if (next.length === records.length) return false;
     await writeAll(next);

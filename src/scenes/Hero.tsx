@@ -5,6 +5,11 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 import { ProceduralArt } from '@/components/art/ProceduralArt';
+import {
+  HangingJasmine,
+  TempleFrame,
+  TempleHorizon,
+} from '@/components/art/Manapam';
 import { RevealText } from '@/components/motion/Reveal';
 import { config, site } from '@/lib/site';
 import { scroll } from '@/lib/scroll';
@@ -118,37 +123,36 @@ export function Hero() {
       ref={rootRef}
       id="hero"
       data-scene="hero"
-      className="scene scene-cinema relative isolate flex flex-col items-center justify-center overflow-hidden px-[var(--gutter)] pb-[clamp(5rem,12vh,9rem)] pt-[clamp(6rem,16vh,10rem)] text-center material-cinema"
+      className="scene scene-paper paper paper-grain relative isolate flex flex-col items-center justify-center overflow-hidden px-[var(--gutter)] pb-[clamp(5rem,12vh,9rem)] pt-[clamp(6rem,16vh,10rem)] text-center"
       aria-labelledby="hero-names"
     >
       {/* --- Far plane: the estate, and the couple within it -------------- */}
       <div ref={backRef} className="pointer-events-none absolute inset-0 -z-20">
-        <ProceduralArt art="couple" className="opacity-[0.55]" />
-        {/* Golden-hour warmth, sitting over the architecture */}
+        <ProceduralArt art="couple" className="opacity-25" />
+        {/* Turmeric warmth over the architecture, kept light enough that the
+            names can sit on top of it without a scrim. */}
         <div
           className="absolute inset-0"
           style={{
             background:
-              'radial-gradient(120% 80% at 50% 68%, rgba(255,214,150,0.20) 0%, rgba(18,58,45,0.35) 42%, rgba(8,8,10,0.9) 82%)',
+              'radial-gradient(120% 80% at 50% 30%, rgb(232 217 178 / 0.5) 0%, rgb(246 238 224 / 0.86) 46%, rgb(250 246 237 / 0.97) 82%)',
           }}
         />
       </div>
 
-      {/* --- Mid plane: haze --------------------------------------------- */}
+      {/* --- Mid plane: the mandapam, and its parallax ---------------------
+          The arch and pillars sit between the backdrop and the names. They are
+          sized from the section, not scaled to fit, so they read as structure
+          rather than as a sticker. Three planes move at different rates, which
+          is what makes the arch read as *in front of* the backdrop. */}
       <div ref={midRef} className="pointer-events-none absolute inset-0 -z-10">
-        <div
-          className="absolute inset-x-[-10%] top-[42%] h-[34vh]"
-          style={{
-            background:
-              'radial-gradient(ellipse at 50% 50%, rgba(232,217,160,0.13), transparent 68%)',
-            filter: 'blur(24px)',
-          }}
-        />
+        <TempleFrame className="opacity-90" />
+        <HangingJasmine count={3} />
       </div>
 
-      {/* --- Near plane: the frame edge ---------------------------------- */}
+      {/* --- Near plane: the frame edge ------------------------------------ */}
       <div ref={foreRef} className="pointer-events-none absolute inset-0 -z-10">
-        <div className="vignette absolute inset-0" />
+        <TempleHorizon opacity={0.1} />
       </div>
 
       {/* --- Type --------------------------------------------------------- */}
@@ -165,17 +169,17 @@ export function Hero() {
             immediate
             delay={0.5}
             stagger={0.055}
-            className="foil font-display text-fluid-4xl font-light uppercase leading-[0.9] tracking-[0.02em] text-balance"
+            className="foil-ink font-display text-fluid-4xl font-light uppercase leading-[0.9] tracking-[0.02em] text-balance"
           >
             {site.namesStacked.groom}
           </RevealText>
 
           <div className="my-[clamp(0.5rem,1.6vh,1.1rem)] flex items-center gap-4" aria-hidden="true">
-            <span className="h-px w-[clamp(2rem,10vw,5rem)] bg-gradient-to-r from-transparent to-gold/50" />
-            <span className="font-display text-[clamp(1.1rem,3.4vw,2.2rem)] font-light text-gold/75">
+            <span className="h-px w-[clamp(2rem,10vw,5rem)] bg-gradient-to-r from-transparent to-gold-antique/50" />
+            <span className="font-display text-[clamp(1.1rem,3.4vw,2.2rem)] font-light text-gold-antique">
               {config.meta.monogramGlyph}
             </span>
-            <span className="h-px w-[clamp(2rem,10vw,5rem)] bg-gradient-to-l from-transparent to-gold/50" />
+            <span className="h-px w-[clamp(2rem,10vw,5rem)] bg-gradient-to-l from-transparent to-gold-antique/50" />
           </div>
 
           <RevealText
@@ -183,19 +187,19 @@ export function Hero() {
             immediate
             delay={0.78}
             stagger={0.055}
-            className="foil font-display text-fluid-4xl font-light uppercase leading-[0.9] tracking-[0.02em] text-balance"
+            className="foil-ink font-display text-fluid-4xl font-light uppercase leading-[0.9] tracking-[0.02em] text-balance"
           >
             {site.namesStacked.bride}
           </RevealText>
         </div>
 
-        {/* The date, embossed rather than printed */}
+        {/* The date, set in the maroon of the silk border. */}
         <RevealText
           as="p"
           immediate
           delay={1.15}
           stagger={0.1}
-          className="mt-[clamp(2.5rem,7vh,4.5rem)] font-display text-fluid-xl font-normal tracking-[0.42em] text-ivory/90"
+          className="mt-[clamp(2.5rem,7vh,4.5rem)] font-display text-fluid-xl font-normal tracking-[0.42em] text-maroon"
         >
           {site.dateLabel.toUpperCase()}
         </RevealText>
@@ -205,7 +209,7 @@ export function Hero() {
           immediate
           delay={1.35}
           stagger={0.08}
-          className="label mt-4 text-gold/70"
+          className="label mt-4 fg-paper-muted"
         >
           {config.location.city} &middot; {config.location.state}
         </RevealText>
@@ -216,7 +220,7 @@ export function Hero() {
           immediate
           delay={1.6}
           stagger={0.06}
-          className="mt-[clamp(2rem,6vh,3.5rem)] max-w-[26ch] font-display text-fluid-md italic leading-relaxed text-ivory/50 text-balance"
+          className="mt-[clamp(2rem,6vh,3.5rem)] max-w-[26ch] font-display text-fluid-md italic leading-relaxed fg-paper-muted text-balance"
         >
           {config.invitation.blessingsLine}
         </RevealText>
@@ -228,9 +232,9 @@ export function Hero() {
         className="pointer-events-none absolute inset-x-0 bottom-0 flex flex-col items-center gap-3 pb-[max(1.75rem,env(safe-area-inset-bottom))]"
         aria-hidden="true"
       >
-        <span className="label text-[0.5rem] text-ivory/25">Scroll</span>
-        <span className="relative block h-12 w-px overflow-hidden bg-gold/12">
-          <span className="cue-line absolute inset-x-0 top-0 h-4 bg-gradient-to-b from-transparent via-gold/70 to-transparent" />
+        <span className="label text-[0.5rem] fg-paper-faint">Scroll</span>
+        <span className="relative block h-12 w-px overflow-hidden bg-gold-antique/20">
+          <span className="cue-line absolute inset-x-0 top-0 h-4 bg-gradient-to-b from-transparent via-gold-antique/70 to-transparent" />
         </span>
       </div>
     </section>

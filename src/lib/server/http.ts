@@ -36,7 +36,19 @@ export function isAllowedOrigin(request: Request): boolean {
   if (expected.length > 0 && expected.includes(origin)) return true;
 
   try {
-    return new URL(origin).origin === new URL(request.url).origin;
+    const sent = new URL(origin);
+
+    // Compare against the host the client actually addressed, not `request.url`.
+    // Any proxy rewrites `request.url` to its own upstream, so `vercel dev`
+    // rejected every legitimate same-origin RSVP (Origin :3142 vs url :57361).
+    // A cross-origin POST still has a different Host, so this still blocks CSRF.
+    const forwarded = request.headers.get('x-forwarded-host');
+    const host = (forwarded?.split(',')[0]?.trim() || request.headers.get('host'))?.trim();
+    if (host && sent.host === host) return true;
+    // Behind a TLS-terminating proxy the scheme differs but the host does not.
+    if (host && sent.hostname === new URL(`http://${host}`).hostname) return true;
+
+    return sent.origin === new URL(request.url).origin;
   } catch {
     return false;
   }

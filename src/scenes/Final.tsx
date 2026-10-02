@@ -4,6 +4,7 @@ import { useCallback } from 'react';
 
 import { Monogram } from '@/components/primitives/Monogram';
 import { ShareActions } from '@/components/ui/ShareActions';
+import { BellAndKalash, HangingJasmine, KolamDivider } from '@/components/art/Manapam';
 import { RevealText } from '@/components/motion/Reveal';
 import { useExperience } from '@/lib/experience';
 import { config, site } from '@/lib/site';
@@ -33,27 +34,40 @@ export function Final() {
     <section
       id="final"
       data-scene="final"
-      className="scene material-cinema scene-pad relative isolate flex flex-col items-center justify-center overflow-hidden px-[var(--gutter)] text-center"
+      className="scene silk scene-pad relative isolate flex flex-col items-center justify-center overflow-hidden px-[var(--gutter)] text-center"
       aria-labelledby="final-heading"
     >
+      {/*
+        The closing beat is the one place the invitation is allowed to be silk.
+        A maroon Kanjivaram ground with a travelling zari band is the most
+        unmistakably South Indian surface there is, and it earns its place by
+        being the last thing a guest reads before the footer.
+      */}
+      <div className="silk-shimmer absolute inset-0 -z-20" aria-hidden="true" />
+
       {/* A single light source, high and behind the type. */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 -z-10"
         style={{
           background:
-            'radial-gradient(60% 45% at 50% 30%, rgba(232,217,160,0.14), transparent 68%)',
+            'radial-gradient(60% 45% at 50% 26%, rgb(232 217 178 / 0.18), transparent 68%)',
         }}
       />
 
+      {/* Jasmine at the lintel, and the ceremonial bell and kalash below. */}
+      <div className="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
+        <HangingJasmine count={2} />
+      </div>
+
       <div className="flex w-full max-w-4xl flex-col items-center gap-[clamp(2.5rem,8vh,4.5rem)]">
-        <Monogram size="lg" withRing foil />
+        <Monogram size="lg" withRing foil="gold" />
 
         <RevealText
           as="h2"
           id="final-heading"
           immediate
-          className="max-w-[18ch] font-display text-fluid-2xl font-light italic leading-[1.15] text-ivory/85 text-balance"
+          className="max-w-[18ch] font-display text-fluid-2xl font-light italic leading-[1.15] fg-silk text-balance"
         >
           Until we meet on the seventeenth of October
         </RevealText>
@@ -77,13 +91,17 @@ export function Final() {
           </RevealText>
         </div>
 
-        <p className="measure max-w-[34ch] text-balance font-display text-fluid-md italic leading-relaxed text-ivory/45">
+        <KolamDivider className="w-[3.5rem] opacity-70" />
+
+        <p className="measure max-w-[34ch] text-balance font-display text-fluid-md italic leading-relaxed fg-silk-muted">
           {config.invitation.blessingsLine} &mdash; {config.location.label}
         </p>
 
+        <BellAndKalash />
+
         <div className="flex flex-col items-center gap-8">
-          <p className="label text-ivory/30">Share the invitation</p>
-          <ShareActions compact />
+          <p className="label fg-silk-muted">Share the invitation</p>
+          <ShareActions compact tone="silk" />
         </div>
 
         {/* Padded to a full 44px touch height without changing the type. */}

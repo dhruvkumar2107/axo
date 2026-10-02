@@ -29,6 +29,10 @@ interface Payload {
   records: RsvpRecord[];
   /** False on a host whose filesystem is thrown away on every deploy. */
   durable: boolean;
+  /** Which store actually answered: a Redis hash, or the local JSON file. */
+  backend: 'upstash' | 'file';
+  /** Someone set half of the durable store's credentials. */
+  misconfigured?: boolean;
 }
 
 export default function AdminPage() {
@@ -77,7 +81,7 @@ export default function AdminPage() {
       <div className="mx-auto flex w-full max-w-5xl flex-col gap-10">
         <header className="flex flex-wrap items-end justify-between gap-6">
           <div className="flex flex-col gap-3">
-            <Monogram size="sm" foil />
+            <Monogram size="sm" foil="gold" />
             <h1 className="font-display text-fluid-2xl font-light text-ivory/90">Guest list</h1>
             <p className="label text-ivory/35">
               {site.dateLabel} &middot; {config.location.city}
@@ -133,7 +137,29 @@ export default function AdminPage() {
           </form>
         ) : (
           <>
-            {payload.durable ? null : (
+            {payload.misconfigured ? (
+              /*
+                Half the credentials are set. The store silently fell back to a
+                local file, so replies are being accepted and will vanish. That
+                is the failure worth shouting about: it looks like it works.
+              */
+              <p
+                className="max-w-[64ch] border-l border-burgundy-muted/60 pl-5 font-display text-fluid-sm italic leading-relaxed text-ivory/55"
+                role="alert"
+              >
+                The Redis store is only half configured, so replies are going to a local file
+                that will be lost on the next deploy. Set both the REST URL and the REST
+                token as environment variables.
+              </p>
+            ) : payload.durable ? (
+              <p className="label text-ivory/30">
+                Replies are stored in{' '}
+                <span className="text-ivory/50">
+                  {payload.backend === 'upstash' ? 'Upstash Redis' : 'a mounted volume'}
+                </span>
+                .
+              </p>
+            ) : (
               /*
                 Said plainly, once, at the top of the only page the family reads.
                 An empty guest list that used to have entries in it is a much

@@ -124,7 +124,7 @@ export function Rsvp() {
     <section
       id="rsvp"
       data-scene="rsvp"
-      className="scene material-velvet scene-pad relative isolate overflow-hidden px-[var(--gutter)]"
+      className="scene scene-paper paper paper-grain scene-pad relative isolate overflow-hidden px-[var(--gutter)]"
       aria-labelledby="rsvp-heading"
     >
       <div
@@ -136,7 +136,7 @@ export function Rsvp() {
       />
 
       <div className="relative mx-auto flex w-full max-w-3xl flex-col items-center gap-[clamp(2.5rem,7vh,4rem)]">
-        <SceneHeading label="Kindly Respond" className="mx-auto" sub={config.rsvp.subheading}>
+        <SceneHeading label="Kindly Respond" tone="ivory" className="mx-auto" sub={config.rsvp.subheading}>
           <span id="rsvp-heading">{config.rsvp.heading}</span>
         </SceneHeading>
 
@@ -146,14 +146,14 @@ export function Rsvp() {
           <form
             onSubmit={onSubmit}
             noValidate
-            className="material-ivory w-full p-[clamp(1.5rem,5vw,3rem)] text-inkwarm shadow-[0_60px_120px_-70px_rgba(0,0,0,0.95)]"
+            className="card-wedding w-full p-[clamp(1.5rem,5vw,3rem)] text-inkwarm shadow-[0_40px_80px_-50px_rgb(58_46_36/0.5)]"
           >
             <span aria-hidden="true" className="pointer-events-none absolute inset-[6%] border border-gold/40" />
 
             <div className="relative flex flex-col gap-9">
               {/* --- The decision ------------------------------------------- */}
               <fieldset className="flex flex-col gap-4">
-                <legend className="label mb-1 text-inkwarm/45">Will you be joining us</legend>
+                <legend className="label mb-1 fg-paper-muted">Will you be joining us</legend>
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <Choice
                     name="attending"
@@ -175,7 +175,7 @@ export function Rsvp() {
               {/* --- Seats --------------------------------------------------- */}
               {attending ? (
                 <fieldset className="flex flex-col gap-3">
-                  <legend className="label mb-1 text-inkwarm/45">Seats required</legend>
+                  <legend className="label mb-1 fg-paper-muted">Seats required</legend>
                   <div className="flex items-center justify-between gap-4 border-b border-inkwarm/15 pb-4">
                     <Stepper
                       value={form.guests}
@@ -183,7 +183,7 @@ export function Rsvp() {
                       max={maxGuests}
                       onChange={(next) => set('guests', next)}
                     />
-                    <p className="font-display text-fluid-sm italic text-inkwarm/50">
+                    <p className="font-display text-fluid-sm italic fg-paper-muted">
                       {form.guests === 1 ? 'One seat' : `${form.guests} seats, including you`}
                     </p>
                   </div>
@@ -194,12 +194,12 @@ export function Rsvp() {
               {/* --- Which functions ----------------------------------------- */}
               {attending && config.events.length > 1 ? (
                 <fieldset className="flex flex-col gap-3">
-                  <legend className="label mb-1 text-inkwarm/45">Functions you can attend</legend>
+                  <legend className="label mb-1 fg-paper-muted">Functions you can attend</legend>
                   <div className="flex flex-col gap-2">
                     {config.events.map((event) => (
                       <label
                         key={event.id}
-                        className="flex cursor-pointer items-center gap-3 py-1 font-display text-fluid-md text-inkwarm/80"
+                        className="flex cursor-pointer items-center gap-3 py-1 font-display text-fluid-md fg-paper"
                       >
                         <input
                           type="checkbox"
@@ -211,7 +211,7 @@ export function Rsvp() {
                         />
                         <span>
                           {event.name}
-                          <span className="ml-2 text-inkwarm/40">
+                          <span className="ml-2 fg-paper-faint">
                             {event.dateLabel ?? 'To be announced'}
                           </span>
                         </span>
@@ -292,7 +292,7 @@ export function Rsvp() {
               </div>
 
               {config.rsvp.deadlineLabel ? (
-                <p className="label text-inkwarm/45">{config.rsvp.deadlineLabel}</p>
+                <p className="label fg-paper-muted">{config.rsvp.deadlineLabel}</p>
               ) : null}
 
               {/* --- Send ------------------------------------------------------ */}
@@ -312,7 +312,7 @@ export function Rsvp() {
                   </p>
                 ) : null}
 
-                <p className="max-w-[42ch] font-display text-fluid-sm italic leading-relaxed text-inkwarm/50">
+                <p className="max-w-[42ch] font-display text-fluid-sm italic leading-relaxed fg-paper-muted">
                   {config.rsvp.note}
                 </p>
               </div>
@@ -360,8 +360,8 @@ function Choice({
       className={cn(
         'flex cursor-pointer items-center gap-3 px-5 py-4 transition-all duration-500 ease-silk',
         checked
-          ? 'border border-gold/70 bg-gold/8 text-inkwarm'
-          : 'border border-inkwarm/20 text-inkwarm/55 hover:border-inkwarm/40',
+          ? 'border border-gold-antique/70 bg-gold-antique/10 text-inkwarm'
+          : 'border border-inkwarm/25 fg-paper-muted hover:border-inkwarm/45',
       )}
     >
       <input
@@ -404,7 +404,7 @@ function Stepper({
         onClick={() => onChange(Math.max(min, value - 1))}
         disabled={value <= min}
         aria-label="One seat fewer"
-        className="grid size-10 place-items-center rounded-full border border-inkwarm/25 text-inkwarm/70 transition-all duration-400 ease-silk enabled:hover:border-gold/70 disabled:opacity-30"
+        className="grid size-10 place-items-center rounded-full border border-inkwarm/25 fg-paper transition-all duration-400 ease-silk enabled:hover:border-gold-antique/70 disabled:opacity-30"
       >
         &minus;
       </button>
@@ -416,7 +416,7 @@ function Stepper({
         onClick={() => onChange(Math.min(max, value + 1))}
         disabled={value >= max}
         aria-label="One seat more"
-        className="grid size-10 place-items-center rounded-full border border-inkwarm/25 text-inkwarm/70 transition-all duration-400 ease-silk enabled:hover:border-gold/70 disabled:opacity-30"
+        className="grid size-10 place-items-center rounded-full border border-inkwarm/25 fg-paper transition-all duration-400 ease-silk enabled:hover:border-gold-antique/70 disabled:opacity-30"
       >
         +
       </button>
@@ -435,8 +435,8 @@ function FieldError({ id, message }: { id: string; message: string | undefined }
 
 function Confirmation({ name, attending }: { name: string; attending: boolean }) {
   return (
-    <div className="material-ivory w-full p-[clamp(2rem,6vw,3.5rem)] text-center text-inkwarm shadow-[0_60px_120px_-70px_rgba(0,0,0,0.95)]">
-      <p className="label text-inkwarm/45">Thank you</p>
+    <div className="card-wedding w-full p-[clamp(2rem,6vw,3.5rem)] text-center text-inkwarm shadow-[0_40px_80px_-50px_rgb(58_46_36/0.5)]">
+      <p className="label fg-paper-muted">Thank you</p>
       <p className="mx-auto mt-6 max-w-[24ch] text-balance font-display text-fluid-2xl font-light italic leading-[1.2]">
         {attending
           ? `We cannot wait to welcome you, ${name.split(' ')[0] ?? name}.`
@@ -445,7 +445,7 @@ function Confirmation({ name, attending }: { name: string; attending: boolean })
       <span aria-hidden="true" className="rule mx-auto mt-8 max-w-[10rem]">
         <span>◆</span>
       </span>
-      <p className="mx-auto mt-6 max-w-[38ch] font-display text-fluid-sm italic text-inkwarm/55">
+      <p className="mx-auto mt-6 max-w-[38ch] font-display text-fluid-sm italic fg-paper-muted">
         {site.dateLabel} &middot; {config.location.label}
       </p>
     </div>
